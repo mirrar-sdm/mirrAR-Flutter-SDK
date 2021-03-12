@@ -12,9 +12,23 @@ dependencies:
   flutter:
     sdk: flutter
 
+  rounded_loading_button: ^1.0.0
+  flutter_inappwebview: 4.0.0+4
+  permission_handler: ^5.1.0+2
+  http: ^0.12.0+4
+  retrofit: ^1.3.4+1
+  dio: ^3.0.10
+  built_value: ^7.1.0
+  json_annotation: ^3.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
+  retrofit_generator: ^1.3.7+5
+  build_runner: ^1.10.0
+  json_serializable: ^3.5.0
+  built_value_generator: ^7.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
