@@ -1,7 +1,7 @@
 name: mirrar_sdk
-description: A new Flutter package project.
+description: A virtual jewellery try-on mirrar SDK.
 version: 0.0.1
-author: Shivam Maindola
+author: StyleDotMe
 homepage: https://github.com/shivammaindola/flutter_sdk
 
 environment:
