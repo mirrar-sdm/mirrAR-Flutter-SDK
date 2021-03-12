@@ -12,20 +12,20 @@ InAppWebViewController _webViewController;
 String uuid;
 String baseUrl;
 bool load=false;
-class WebViewWidget extends StatefulWidget {
+class MirrarSDK extends StatefulWidget {
   
   final String username;
   final String password;
   final String jsonObject;
 
-  WebViewWidget({Key key,this.username,this.password,this.jsonObject}) : super(key: key);
+  MirrarSDK({Key key,this.username,this.password,this.jsonObject}) : super(key: key);
 
 
   @override
   _MyHomePageState createState() => _MyHomePageState(username:this.username,password:this.password,jsonObject:this.jsonObject);
 }
 
-class _MyHomePageState extends State<WebViewWidget> {
+class _MyHomePageState extends State<MirrarSDK> {
   final String username;
   final String password;
   final String jsonObject;

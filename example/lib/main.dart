@@ -93,7 +93,7 @@ String jsonData="{\"options\": {\"productData\": {\"Necklaces\": {\"items\": [\"
                 onPressed: (){
  Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => WebViewWidget(
+    MaterialPageRoute(builder: (context) => MirrarSDK(
       username: 'tanishqwebar',
       password: 'w4y0EihepyIAA50U',
       jsonObject: jsonData,
