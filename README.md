@@ -17,7 +17,9 @@ Virtual jewellery try-on Flutter package project.
    WidgetsFlutterBinding.ensureInitialized();
    await Permission.camera.request();
    ```
-3. Use MirrarSDK widget with three constructor to navigate 
+3. Minimum sdk shoud be greater than 19 in android
+
+4. Use MirrarSDK widget with three constructor to navigate 
 
 ```String jsonData="{\"options\": {\"productData\": {\"Necklaces\": {\"items\": [\"513319NDJAA40\"],\"type\": \"neck\"}}}}";```
 
