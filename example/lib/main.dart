@@ -1,9 +1,15 @@
+import 'package:example/LaunchMirrrar.dart';
 import 'package:flutter/material.dart';
 import 'package:mirrar_sdk/mirrar_sdk.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //  await FlutterDownloader.initialize(
+  //     debug: true // optional: set false to disable printing logs to console
+  // );
+  // await Permission.storage.request();
   await Permission.camera.request();
   runApp(MyApp());
 }
@@ -33,9 +39,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String jsonData =
-      "{\"options\": {\"productData\": {\"Necklaces\": {\"items\": [\"513319NDJAA40\"],\"type\": \"neck\"}}}}";
+  
 
+   @override
+  void initState() {
+    super.initState();
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,11 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MirrarSDK(
-                                          username: 'tanishqwebar',
-                                          password: 'w4y0EihepyIAA50U',
-                                          jsonObject: jsonData,
-                                        )));
+                                    builder: (context) => MirrarPage()));
                           },
                           color: Colors.pink,
                           textColor: Colors.white,

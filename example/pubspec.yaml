@@ -29,6 +29,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
   permission_handler: ^5.1.0+2
+  provider: ^4.0.5+1
   mirrar_sdk:
     path: ../
 
