@@ -25,9 +25,25 @@ Virtual jewellery try-on Flutter package project.
 
 ```
 MirrarSDK(
-      username: '',
-      password: '',
-      jsonObject: jsonData,
+      jsonData: jsonData,
+      uuid: '',
+      onMessageCallback: (String event,String message) {
+        if (event == "details") {
+          //message is the product_code
+        } else if (event == "whatsapp") {
+          //message is the image uri
+        } else if (event == "download") {
+          //message is the image uri
+        } else if (event == "wishlist") {
+          //message is the product_code
+        } else if (event == "unwishlist") {
+          //message is the product_code
+        } else if (event == "cart") {
+          //message is the product_code
+        } else if (event == "remove_cart") {
+          //message is the product_code
+        }
+      },
     )
 ```
 
