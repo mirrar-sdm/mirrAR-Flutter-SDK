@@ -15,6 +15,7 @@ Virtual jewellery try-on Flutter package project.
 2. Add these 2 lines inside main
    ```
    WidgetsFlutterBinding.ensureInitialized();
+   await Permission.storage.request();
    await Permission.camera.request();
    ```
 3. Minimum sdk shoud be greater than 19 in android
