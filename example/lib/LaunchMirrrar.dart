@@ -19,8 +19,7 @@ class _CounterPageState extends State<MirrarPage> {
         if (event == "details") {
           //message is the product_code
         } else if (event == "whatsapp") {
-
-          //message is the image uri
+          //message is the image ur
         } else if (event == "download") {
           //message is the image uri
         } else if (event == "wishlist") {

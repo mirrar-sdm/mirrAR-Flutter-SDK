@@ -11,6 +11,7 @@ Future<void> main() async {
   // );
   // await Permission.storage.request();
   await Permission.camera.request();
+  await Permission.storage.request();
   runApp(MyApp());
 }
 

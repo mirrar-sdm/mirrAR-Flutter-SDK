@@ -128,6 +128,7 @@ class _MyHomePageState extends State<MirrarSDK> {
             int end=url.indexOf('source');
             String sendUrl=url.substring(t+5,end-1);
          Share.text('MirrAR', '$sendUrl', 'text/plain');
+          onMessageCallback("whatsapp",sendUrl);
           },
           onWebViewCreated: (InAppWebViewController controller) {
             _webViewController = controller;
@@ -161,15 +162,13 @@ class _MyHomePageState extends State<MirrarSDK> {
                   
                     }
                     
-                    
-                  print("event: $event and $secondArg and $k");
+                    List<String> listStr=new List();
+                    listStr=str.split("base64,");
+                    String substring = listStr.elementAt(1);
+                  print("event: $event and $substring and $k");
 
                   if (event == "details") {
                     onMessageCallback("details",secondArg);
-                  } else if (event == "whatsapp") {
-                    onMessageCallback("whatsapp",secondArg);
-                  } else if (event == "download") {
-                    onMessageCallback("download",secondArg);
                   } else if (event == "wishlist") {
                     onMessageCallback("wishlist",secondArg);
                   } else if (event == "unwishlist") {
@@ -180,7 +179,7 @@ class _MyHomePageState extends State<MirrarSDK> {
                     onMessageCallback("remove_cart",secondArg);
                   }
                   else if (event == "share") {
-                    onMessageCallback("share",secondArg);
+                    onMessageCallback("share",substring);
                   }
                 });
           },
@@ -195,6 +194,8 @@ class _MyHomePageState extends State<MirrarSDK> {
           },
           onDownloadStart: (controller, url) async {
             print("onDownloadStart $url");
+            onMessageCallback("download",url);
+
             _createFileFromString(url);
            
           },
@@ -218,6 +219,7 @@ Future<String> _createFileFromString(String url) async {
     if (url[i] == ',') break;
   }
   String smallUrl = url.substring(i + 1, url.length);
+                  
   Uint8List bytes = base64.decode(smallUrl);
   String dir = (await getApplicationDocumentsDirectory()).path;
   String fullPath = '$dir/abc.png';

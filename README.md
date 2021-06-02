@@ -8,7 +8,7 @@ Virtual jewellery try-on Flutter package project.
 
 ```
   mirrar_sdk:
-    git: git://github.com/shivammaindola/flutter_sdk.git
+    git: git://github.com/styledotme/mirrAR-Android-SDK.git
   permission_handler: ^5.1.0+2
 ```
 
@@ -18,10 +18,16 @@ Virtual jewellery try-on Flutter package project.
    await Permission.camera.request();
    ```
 3. Minimum sdk shoud be greater than 19 in android
-
+  ```
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+  ```
+4. Add these permissions inside Manifest.xml
+ 
 4. Use MirrarSDK widget with three constructor to navigate 
 
-```String jsonData="{\"options\": {\"productData\": {\"Necklaces\": {\"items\": [\"513319NDJAA40\"],\"type\": \"neck\"}}}}";```
+```String jsonData="{\"options\": {\"productData\": {\"Necklaces\": {\"items\": [\"\"],\"type\": \"neck\"}}}}";```
 
 ```
 MirrarSDK(
