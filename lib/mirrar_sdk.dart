@@ -12,6 +12,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:webview_flutter/webview_flutter.dart' as webview;
 
 import 'CodeMap.dart';
 
@@ -39,13 +40,16 @@ class _MyHomePageState extends State<MirrarSDK> {
   final String jsonData;
   final String uuid;
   final Function(String,String) onMessageCallback;
+  final GlobalKey webViewKey = GlobalKey();
 
   _MyHomePageState({this.jsonData, this.uuid, this.onMessageCallback});
 
   @override
   void initState() {
     super.initState();
-
+  if (Platform.isAndroid) {
+    webview.WebView.platform=webview.SurfaceAndroidWebView();
+  }
     checkAPI();
   }
 
@@ -95,7 +99,7 @@ class _MyHomePageState extends State<MirrarSDK> {
         .replaceAll(",&", "&");
 
     setState(() {
-      baseUrl = "https://cdn.styledotme.com/webpack/mirrar.html?brand_id=" +
+      baseUrl = "https://cdn.styledotme.com/mirrar-test/mirrar.html?brand_id=" +
           uuid +
           csv +
           "&sku=" +
@@ -112,31 +116,37 @@ class _MyHomePageState extends State<MirrarSDK> {
       return Scaffold(
         backgroundColor: Colors.black,
         body: InAppWebView(
-          initialUrl: baseUrl,
+          key: webViewKey,
+          initialUrlRequest:
+                        URLRequest(url: Uri.parse(baseUrl)),
+        
           initialOptions: InAppWebViewGroupOptions(
             crossPlatform: InAppWebViewOptions(
                 mediaPlaybackRequiresUserGesture: false,
-                debuggingEnabled: true,
+                
                 useOnDownloadStart: true,
                 useShouldOverrideUrlLoading: true),
-          ),         
-          shouldOverrideUrlLoading:
-              (controller, shouldOverrideUrlLoadingRequest) async {
-            var url = shouldOverrideUrlLoadingRequest.url;
-            var uri = Uri.parse(url);
-            int t=url.indexOf('text');
+          ),  
+           shouldOverrideUrlLoading: (controller, navigationAction) async {
+                          var uri = navigationAction.request.url;
+                          String url=uri.toString();
+                          int t=url.indexOf('text');
             int end=url.indexOf('source');
             String sendUrl=url.substring(t+5,end-1);
          Share.text('MirrAR', '$sendUrl', 'text/plain');
           onMessageCallback("whatsapp",sendUrl);
-          },
+
+                          return NavigationActionPolicy.ALLOW;
+                        },       
+         
           onWebViewCreated: (InAppWebViewController controller) {
             _webViewController = controller;
 
             _webViewController.addJavaScriptHandler(
                 handlerName: 'message',
-                callback: (args) {
+                callback: (args) {         
                   String str = args.toString();
+                   print("message: asasasaas $str");
                   String event = '';
                   int j = 0;
                   for (int i = 9; i < str.length; i++) {
@@ -167,6 +177,9 @@ class _MyHomePageState extends State<MirrarSDK> {
                     String substring = listStr.elementAt(1);
                   print("event: $event and $substring and $k");
 
+                  if(event=="mirrar-popup-closed"){
+                    onMessageCallback("mirrar-popup-closed",secondArg);
+                  }
                   if (event == "details") {
                     onMessageCallback("details",secondArg);
                   } else if (event == "wishlist") {
@@ -177,8 +190,7 @@ class _MyHomePageState extends State<MirrarSDK> {
                     onMessageCallback("cart",secondArg);
                   } else if (event == "remove_cart") {
                     onMessageCallback("remove_cart",secondArg);
-                  }
-                  else if (event == "share") {
+                  }else if (event == "share") {
                     onMessageCallback("share",substring);
                   }
                 });
@@ -194,9 +206,9 @@ class _MyHomePageState extends State<MirrarSDK> {
           },
           onDownloadStart: (controller, url) async {
             print("onDownloadStart $url");
-            onMessageCallback("download",url);
+            onMessageCallback("download",url.toString());
 
-            _createFileFromString(url);
+            _createFileFromString(url.toString());
            
           },
         ),
