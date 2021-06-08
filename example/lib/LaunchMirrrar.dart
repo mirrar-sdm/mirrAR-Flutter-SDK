@@ -30,8 +30,7 @@ class _CounterPageState extends State<MirrarPage> {
           //message is the product_code
         } else if (event == "remove_cart") {
           //message is the product_code
-        }
-        else if(event=="share"){
+        } else if(event=="share"){
           //message is the image uri
         }
         else if (event == "mirrar-popup-closed") {

@@ -123,12 +123,7 @@ class _MyHomePageState extends State<MirrarSDK> {
                 mediaPlaybackRequiresUserGesture: false,
                 useOnDownloadStart: true,
                 useShouldOverrideUrlLoading: true),
-            android: AndroidInAppWebViewOptions(
-              useHybridComposition: true,
-            ),
-            ios: IOSInAppWebViewOptions(
-              allowsInlineMediaPlayback: true,
-            ),
+           
           ),
           shouldOverrideUrlLoading: (controller, navigationAction) async {
             var uri = navigationAction.request.url;
@@ -142,7 +137,7 @@ class _MyHomePageState extends State<MirrarSDK> {
              return NavigationActionPolicy.CANCEL;
             }
             else
-             return NavigationActionPolicy.CANCEL;
+             return NavigationActionPolicy.ALLOW;
            
           },
           onWebViewCreated: (InAppWebViewController controller) {
@@ -177,11 +172,11 @@ class _MyHomePageState extends State<MirrarSDK> {
 
                   
                  
-
+                // print("eventName: $event");
                   if (event == "mirrar-popup-closed") {
                     onMessageCallback("mirrar-popup-closed", secondArg);
                   }
-                  if (event == "details") {
+                  else if (event == "details") {
                     onMessageCallback("details", secondArg);
                   } else if (event == "wishlist") {
                     onMessageCallback("wishlist", secondArg);
