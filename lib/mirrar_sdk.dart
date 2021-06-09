@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:mirrar_sdk/SafariBrowser.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
 
@@ -44,6 +45,7 @@ class _MyHomePageState extends State<MirrarSDK> {
   final GlobalKey webViewKey = GlobalKey();
   final Completer<InAppWebViewController> _completeController =
   Completer<InAppWebViewController>();
+  final ChromeSafariBrowser browser = new MyChromeSafariBrowser();
 
   _MyHomePageState({this.jsonData, this.uuid, this.onMessageCallback});
 
@@ -53,6 +55,12 @@ class _MyHomePageState extends State<MirrarSDK> {
     if (Platform.isAndroid) {
       webview.WebView.platform = webview.SurfaceAndroidWebView();
     }
+    // browser.addMenuItem(new ChromeSafariBrowserMenuItem(
+    //     id: 1,
+    //     label: 'Custom item menu 1',
+    //     action: (url, title) {
+    //       print('Custom item menu 1 clicked!');
+    //     }));
     checkAPI();
   }
 
@@ -147,111 +155,20 @@ Future<bool> _exitApp(BuildContext context) async {
               ),
             ),
           ),),
-        body: InAppWebView(
-          key: webViewKey,
-          initialUrlRequest: URLRequest(url: Uri.parse(baseUrl)),
-          initialOptions: InAppWebViewGroupOptions(
-            crossPlatform: InAppWebViewOptions(
-                mediaPlaybackRequiresUserGesture: false,
-                useOnDownloadStart: true,
-                useShouldOverrideUrlLoading: true),
-                android: AndroidInAppWebViewOptions(
-            useShouldInterceptRequest: true,
-          ),
-          ios: IOSInAppWebViewOptions(
-            allowsInlineMediaPlayback: true,
-          ),
-          ),
-          shouldOverrideUrlLoading: (controller, navigationAction) async {
-            var uri = navigationAction.request.url;
-            String url = uri.toString();
-            if(url.contains('whatsapp')){
-            int t = url.indexOf('text');
-            int end = url.indexOf('source');
-            String sendUrl = url.substring(t + 5, end - 1);
-            Share.text('MirrAR', '$sendUrl', 'text/plain');
-            onMessageCallback("whatsapp", sendUrl);
-             return NavigationActionPolicy.CANCEL;
-            }
-            else
-             return NavigationActionPolicy.ALLOW;
-           
-          },
-           androidOnPermissionRequest: (controller, origin, resources) async {
-          return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
-        },
-          onWebViewCreated: (InAppWebViewController controller) {
-            _webViewController = controller;
-            _completeController.complete(controller);
-
-            _webViewController.addJavaScriptHandler(
-                handlerName: 'message',
-                callback: (args) {
-                  String str = args.toString();
-                  print("message: asasasaas $str");
-                  String event = '';
-                  int j = 0;
-                  for (int i = 9; i < str.length; i++) {
-                    if (str[i] != ',') {
-                      event += str[i];
-                    } else {
-                      j = i;
-                      break;
-                    }
-                  }
-                  int k = 0;
-                  String secondArg = '';
-                  int check = 0;
-                  for (int i = j + 2; i < str.length; i++) {
-                    if (str[i] != ",") {
-                      secondArg += str[i];
-                    } else {
-                      k = i;
-                      break;
-                    }
-                  }
-
-                  
-                 
-                // print("eventName: $event");
-                  if (event == "mirrar-popup-closed") {
-                    onMessageCallback("mirrar-popup-closed", secondArg);
-                  }
-                  else if (event == "details") {
-                    onMessageCallback("details", secondArg);
-                  } else if (event == "wishlist") {
-                    onMessageCallback("wishlist", secondArg);
-                  } else if (event == "unwishlist") {
-                    onMessageCallback("unwishlist", secondArg);
-                  } else if (event == "cart") {
-                    onMessageCallback("cart", secondArg);
-                  } else if (event == "remove_cart") {
-                    onMessageCallback("remove_cart", secondArg);
-                  } else if (event == "share") {
-                    print("checkitonce");
-                    List<String> listStr = new List();
-                  listStr = str.split(',');
-                  // for(int i=0;i<listStr.length;i++){
-                  //   print("checkitonce: ${listStr.elementAt(i)}");
-                  // }
-                  String substring = listStr.elementAt(2);
-                    Uint8List _bytes = base64.decode(substring);
-                    Share.file('MirrAR SDK', 'mirrar.jpg', _bytes, 'image/jpg');
-                    onMessageCallback("share", substring);
-                  }
-                });
-          },
-          onConsoleMessage: (controller, consoleMessage) {
-            print("checktest $consoleMessage");
-          },
-          
-          onDownloadStart: (controller, url) async {
-            print("onDownloadStart $url");
-            onMessageCallback("download", url.toString());
-
-            _createFileFromString(url.toString());
-          },
-        ),
+        body: Center(
+          child: ElevatedButton(
+            child: Text("Open Browser"),
+            onPressed: () async {
+              await browser.open(
+                  url: Uri.parse(baseUrl),
+                  options: ChromeSafariBrowserClassOptions(
+                      android: AndroidChromeCustomTabsOptions(
+                        enableUrlBarHiding: false,
+                        showTitle: false,
+                          addDefaultShareMenuItem: false),
+                      ios: IOSSafariOptions(barCollapsingEnabled: true)));
+            },
+          ),),
       ));
     else {
       return Scaffold(
