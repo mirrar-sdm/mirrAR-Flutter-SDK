@@ -8,7 +8,7 @@ Virtual jewellery try-on Flutter package project.
 
 ```
   mirrar_sdk:
-    git: git://github.com/styledotme/mirrAR-Android-SDK.git
+    git: git://github.com/styledotme/mirrAR-Flutter-SDK.git
   permission_handler: ^5.1.0+2
 ```
 
@@ -35,10 +35,10 @@ MirrarSDK(
       jsonData: jsonData,
       uuid: '',
       onMessageCallback: (String event,String message) {
-        if (event == "details") {
+         if (event == "details") {
           //message is the product_code
         } else if (event == "whatsapp") {
-          //message is the image uri
+          //message is the image url
         } else if (event == "download") {
           //message is the image uri
         } else if (event == "wishlist") {
@@ -48,6 +48,10 @@ MirrarSDK(
         } else if (event == "cart") {
           //message is the product_code
         } else if (event == "remove_cart") {
+          //message is the product_code
+        } else if(event=="share"){
+          //message is the image uri
+        }else if (event == "mirrar-popup-closed") {
           //message is the product_code
         }
       },

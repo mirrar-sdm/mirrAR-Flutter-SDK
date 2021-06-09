@@ -1,5 +1,6 @@
 library mirrar_sdk;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -41,6 +42,8 @@ class _MyHomePageState extends State<MirrarSDK> {
   final String uuid;
   final Function(String, String) onMessageCallback;
   final GlobalKey webViewKey = GlobalKey();
+  final Completer<InAppWebViewController> _completeController =
+  Completer<InAppWebViewController>();
 
   _MyHomePageState({this.jsonData, this.uuid, this.onMessageCallback});
 
@@ -53,6 +56,15 @@ class _MyHomePageState extends State<MirrarSDK> {
     checkAPI();
   }
 
+Future<bool> _exitApp(BuildContext context) async {
+  if (await _webViewController.canGoBack()) {
+    print("onwill goback");
+    _webViewController.goBack();
+  } else {
+    Navigator.pop(context);
+    return Future.value(false);
+  }
+}
   Future<void> checkAPI() async {
     Map<String, CodeMap> activeMap = new Map();
     Map<String, CodeMap> showMap = new Map();
@@ -99,7 +111,7 @@ class _MyHomePageState extends State<MirrarSDK> {
         .replaceAll(",&", "&");
 
     setState(() {
-      baseUrl = "https://cdn.styledotme.com/webpack/mirrar.html?brand_id=" +
+      baseUrl = "https://cdn.styledotme.com/mirrar-test/mirrar.html?brand_id=" +
           uuid +
           csv +
           "&sku=" +
@@ -113,8 +125,28 @@ class _MyHomePageState extends State<MirrarSDK> {
   @override
   Widget build(BuildContext context) {
     if (load)
-      return Scaffold(
+      return WillPopScope(
+      onWillPop: () => _exitApp(context),
+      child: Scaffold(
         backgroundColor: Colors.black,
+         bottomNavigationBar: Container(
+          height: 50,
+          color: Colors.white,
+          child: InkWell(
+            onTap: () => _exitApp(context),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  Text('Dismiss'),
+                ],
+              ),
+            ),
+          ),),
         body: InAppWebView(
           key: webViewKey,
           initialUrlRequest: URLRequest(url: Uri.parse(baseUrl)),
@@ -123,7 +155,12 @@ class _MyHomePageState extends State<MirrarSDK> {
                 mediaPlaybackRequiresUserGesture: false,
                 useOnDownloadStart: true,
                 useShouldOverrideUrlLoading: true),
-           
+                android: AndroidInAppWebViewOptions(
+            useShouldInterceptRequest: true,
+          ),
+          ios: IOSInAppWebViewOptions(
+            allowsInlineMediaPlayback: true,
+          ),
           ),
           shouldOverrideUrlLoading: (controller, navigationAction) async {
             var uri = navigationAction.request.url;
@@ -140,8 +177,12 @@ class _MyHomePageState extends State<MirrarSDK> {
              return NavigationActionPolicy.ALLOW;
            
           },
+           androidOnPermissionRequest: (controller, origin, resources) async {
+          return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
+        },
           onWebViewCreated: (InAppWebViewController controller) {
             _webViewController = controller;
+            _completeController.complete(controller);
 
             _webViewController.addJavaScriptHandler(
                 handlerName: 'message',
@@ -203,12 +244,7 @@ class _MyHomePageState extends State<MirrarSDK> {
           onConsoleMessage: (controller, consoleMessage) {
             print("checktest $consoleMessage");
           },
-          androidOnPermissionRequest: (InAppWebViewController controller,
-              String origin, List<String> resources) async {
-            return PermissionRequestResponse(
-                resources: resources,
-                action: PermissionRequestResponseAction.GRANT);
-          },
+          
           onDownloadStart: (controller, url) async {
             print("onDownloadStart $url");
             onMessageCallback("download", url.toString());
@@ -216,13 +252,13 @@ class _MyHomePageState extends State<MirrarSDK> {
             _createFileFromString(url.toString());
           },
         ),
-      );
+      ));
     else {
       return Scaffold(
           backgroundColor: Colors.white,
           body: Center(
             child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.pink,
             ),
           ));
     }
