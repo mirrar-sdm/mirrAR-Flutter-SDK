@@ -157,7 +157,7 @@ Future<bool> _exitApp(BuildContext context) async {
           ),),
         body: Center(
           child: ElevatedButton(
-            child: Text("Open Browser"),
+            child: Text("Open link"),
             onPressed: () async {
               await browser.open(
                   url: Uri.parse(baseUrl),
