@@ -1,61 +1,15 @@
-# Mirrar SDK
+# plugin_mirrar
 
-Virtual jewellery try-on Flutter package project.
+A new flutter plugin project.
 
-## How to import mirrAR flutter SDK
+## Getting Started
 
-1. Add these lines in your pubspec.yaml under dependencies
+This project is a starting point for a Flutter
+[plug-in package](https://flutter.dev/developing-packages/),
+a specialized package that includes platform-specific implementation code for
+Android and/or iOS.
 
-```
-  mirrar_sdk:
-    git: git://github.com/styledotme/mirrAR-Flutter-SDK.git
-  permission_handler: ^5.1.0+2
-```
+For help getting started with Flutter, view our
+[online documentation](https://flutter.dev/docs), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
 
-2. Add these 2 lines inside main
-   ```
-   WidgetsFlutterBinding.ensureInitialized();
-   await Permission.storage.request();
-   await Permission.camera.request();
-   ```
-3. Minimum sdk shoud be greater than 19 in android
-  ```
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-  ```
-4. Add these permissions inside Manifest.xml
- 
-4. Use MirrarSDK widget with three constructor to navigate 
-
-```String jsonData="{\"options\": {\"productData\": {\"Necklaces\": {\"items\": [\"\"],\"type\": \"neck\"}}}}";```
-
-```
-MirrarSDK(
-      jsonData: jsonData,
-      uuid: '',
-      onMessageCallback: (String event,String message) {
-         if (event == "details") {
-          //message is the product_code
-        } else if (event == "whatsapp") {
-          //message is the image url
-        } else if (event == "download") {
-          //message is the image uri
-        } else if (event == "wishlist") {
-          //message is the product_code
-        } else if (event == "unwishlist") {
-          //message is the product_code
-        } else if (event == "cart") {
-          //message is the product_code
-        } else if (event == "remove_cart") {
-          //message is the product_code
-        } else if(event=="share"){
-          //message is the image uri
-        }else if (event == "mirrar-popup-closed") {
-          //message is the product_code
-        }
-      },
-    )
-```
-
-    

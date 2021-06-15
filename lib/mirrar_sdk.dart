@@ -1,53 +1,56 @@
-library mirrar_sdk;
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:mirrar_sdk/SafariBrowser.dart';
+import 'package:mirrar_sdk/safari_browser.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
 
-import 'CodeMap.dart';
+import 'code_map.dart';
 
-InAppWebViewController _webViewController;
-String uuid;
-String baseUrl;
+  InAppWebViewController? _webViewController;
+String? uuid;
+String? baseUrl;
 bool load = false;
-
+String mode="webview";
 class MirrarSDK extends StatefulWidget {
   final String uuid;
   final String jsonData;
   final Function(String, String) onMessageCallback;
 
-  MirrarSDK({Key key, this.jsonData, this.uuid, this.onMessageCallback})
+  MirrarSDK({Key? key, required this.jsonData,required  this.uuid,required  this.onMessageCallback})
       : super(key: key);
 
   @override
+  // ignore: no_logic_in_create_state
   _MyHomePageState createState() => _MyHomePageState(
-      jsonData: this.jsonData,
-      uuid: this.uuid,
-      onMessageCallback: this.onMessageCallback);
+      jsonData: jsonData,
+      uuid: uuid,
+      onMessageCallback: onMessageCallback);
 }
 
 class _MyHomePageState extends State<MirrarSDK> {
-  final String jsonData;
-  final String uuid;
+
+  final String? jsonData;
+  final String? uuid;
+   static const platform = MethodChannel('com.sdk.mirrarflutter/navToTryOn');
+  
   final Function(String, String) onMessageCallback;
   final GlobalKey webViewKey = GlobalKey();
   final Completer<InAppWebViewController> _completeController =
   Completer<InAppWebViewController>();
   final ChromeSafariBrowser browser = new MyChromeSafariBrowser();
-
-  _MyHomePageState({this.jsonData, this.uuid, this.onMessageCallback});
+  _MyHomePageState({required this.jsonData,required  this.uuid,required  this.onMessageCallback});
 
   @override
   void initState() {
@@ -55,30 +58,15 @@ class _MyHomePageState extends State<MirrarSDK> {
     if (Platform.isAndroid) {
       webview.WebView.platform = webview.SurfaceAndroidWebView();
     }
-    // browser.addMenuItem(new ChromeSafariBrowserMenuItem(
-    //     id: 1,
-    //     label: 'Custom item menu 1',
-    //     action: (url, title) {
-    //       print('Custom item menu 1 clicked!');
-    //     }));
     checkAPI();
   }
 
-Future<bool> _exitApp(BuildContext context) async {
-  if (await _webViewController.canGoBack()) {
-    print("onwill goback");
-    _webViewController.goBack();
-  } else {
-    Navigator.pop(context);
-    return Future.value(false);
-  }
-}
   Future<void> checkAPI() async {
     Map<String, CodeMap> activeMap = new Map();
     Map<String, CodeMap> showMap = new Map();
     Map<String, List<String>> mCodes = new Map();
 
-    Map valueMap = json.decode(jsonData);
+    Map valueMap = json.decode(jsonData!);
     // print(valueMap);
     //print(valueMap['options']['productData']);
 
@@ -90,8 +78,10 @@ Future<bool> _exitApp(BuildContext context) async {
     }
 
     showMap.forEach((key, value) {
-      List<String> codes = new List();
-      value.items.forEach((element) {
+      // ignore: deprecated_member_use
+      // ignore: prefer_collection_literals
+      List<String> codes =  List<String>.filled(0,'', growable:true);
+      value.items!.forEach((element) {
         codes.add(element);
       });
 
@@ -103,7 +93,7 @@ Future<bool> _exitApp(BuildContext context) async {
 //print(activeMap['Necklaces'].items );
     //print(mCodes.length);
 
-    List<String> codes = new List();
+    List<String> codes = List<String>.filled(0,'', growable:true);
     mCodes.forEach((key, value) {
       codes.add("&$key=");
       codes.addAll(value);
@@ -119,8 +109,8 @@ Future<bool> _exitApp(BuildContext context) async {
         .replaceAll(",&", "&");
 
     setState(() {
-      baseUrl = "https://cdn.styledotme.com/mirrar-test/mirrar.html?brand_id=" +
-          uuid +
+      baseUrl = "https://cdn.styledotme.com/webpack/mirrar.html?brand_id=" +
+          uuid! +
           csv +
           "&sku=" +
           codes.elementAt((codes.length > 0) && codes.contains('#') ? 1 : 0) +
@@ -128,16 +118,83 @@ Future<bool> _exitApp(BuildContext context) async {
       print(baseUrl);
       load = true;
     });
+     
+    if (Platform.isIOS) {
+  var iosInfo = await DeviceInfoPlugin().iosInfo;
+  
+  var version = iosInfo.systemVersion;
+  if(int.parse(version)<14.3){
+   mode="safari";
+   openSafari(baseUrl!);
   }
+  else{
+    setState(() {
+      load=true;
+    });
+  }
+  
+}
+else{
+     setState(() {
+      load=true;
+    });
+  }
+  }
+openSafari(String url) async {
+   var options = {
+  "brandId": "c41ade6a-fd1c-4e8b-ac78-4df64da8ae5f",
+  "productData": {
+  "Bracelets": {
+  "items": ["BR-01", "BR-02", "BR-03"],
+  "type": "wrist"
+  },
+  "Earrings": {
+  "items": ["1503677279384_RIB_2113_1", "CT-2032", "CS2124E"],
+  "type": "ear"
+  },
+  "Rings": {
+  "items": ["RN-01", "RN-013", "RN-01543"],
+  "type": "finger"
+  },
+  "Sets": {
+  "items": ["CS-414"],
+  "type": "set"
+  }
+  }
+};
+    try {
+      final int result = await platform.invokeMethod('goToTryOn', {"options": options});
+      print('Resul: $result');
+    } on PlatformException catch (e) {
+      print("Failed: '${e.message}'.");
+    }
+}
 
-  @override
+
+
+
+Future<bool> _exitApp(BuildContext context) async {
+  if (await _webViewController!.canGoBack()) {
+    print("onwill goback");
+    _webViewController!.goBack();
+    return Future.value(false);
+  } else {
+    Navigator.pop(context);
+    return Future.value(false);
+  }
+}
+Future<bool> _exitAppSafari(BuildContext context) async {
+  
+    Navigator.pop(context);
+    return Future.value(false);
+  
+}
+   @override
   Widget build(BuildContext context) {
-    if (load)
-      return WillPopScope(
-      onWillPop: () => _exitApp(context),
-      child: Scaffold(
+    if (load){
+      return Scaffold(
         backgroundColor: Colors.black,
-         bottomNavigationBar: Container(
+        bottomNavigationBar: Container(
           height: 50,
           color: Colors.white,
           child: InkWell(
@@ -155,27 +212,134 @@ Future<bool> _exitApp(BuildContext context) async {
               ),
             ),
           ),),
-        body: Center(
-          child: ElevatedButton(
-            child: Text("Open link"),
-            onPressed: () async {
-              await browser.open(
-                  url: Uri.parse(baseUrl),
-                  options: ChromeSafariBrowserClassOptions(
-                      android: AndroidChromeCustomTabsOptions(
-                        enableUrlBarHiding: false,
-                        showTitle: false,
-                          addDefaultShareMenuItem: false),
-                      ios: IOSSafariOptions(barCollapsingEnabled: true)));
-            },
-          ),),
-      ));
+        body: InAppWebView(
+          key: webViewKey,
+          initialUrlRequest: URLRequest(url: Uri.parse(baseUrl!)),
+          initialOptions: InAppWebViewGroupOptions(
+            crossPlatform: InAppWebViewOptions(
+                mediaPlaybackRequiresUserGesture: false,
+                useOnDownloadStart: true,
+                useShouldOverrideUrlLoading: true),
+           
+          ),
+          shouldOverrideUrlLoading: (controller, navigationAction) async {
+            var uri = navigationAction.request.url;
+            String url = uri.toString();
+            if(url.contains('whatsapp')){
+            int t = url.indexOf('text');
+            int end = url.indexOf('source');
+            String sendUrl = url.substring(t + 5, end - 1);
+            Share.text('MirrAR', '$sendUrl', 'text/plain');
+            onMessageCallback("whatsapp", sendUrl);
+             return NavigationActionPolicy.CANCEL;
+            }
+            else
+             return NavigationActionPolicy.ALLOW;
+           
+          },
+          onWebViewCreated: (InAppWebViewController controller) {
+            _webViewController = controller;
+
+            _webViewController!.addJavaScriptHandler(
+                handlerName: 'message',
+                callback: (args) {
+                  String str = args.toString();
+                  print("message: asasasaas $str");
+                  String event = '';
+                  int j = 0;
+                  for (int i = 9; i < str.length; i++) {
+                    if (str[i] != ',') {
+                      event += str[i];
+                    } else {
+                      j = i;
+                      break;
+                    }
+                  }
+                  int k = 0;
+                  String secondArg = '';
+                  int check = 0;
+                  for (int i = j + 2; i < str.length; i++) {
+                    if (str[i] != ",") {
+                      secondArg += str[i];
+                    } else {
+                      k = i;
+                      break;
+                    }
+                  }
+
+                  
+                 
+                // print("eventName: $event");
+                  if (event == "mirrar-popup-closed") {
+                    onMessageCallback("mirrar-popup-closed", secondArg);
+                  }
+                  else if (event == "details") {
+                    onMessageCallback("details", secondArg);
+                  } else if (event == "wishlist") {
+                    onMessageCallback("wishlist", secondArg);
+                  } else if (event == "unwishlist") {
+                    onMessageCallback("unwishlist", secondArg);
+                  } else if (event == "cart") {
+                    onMessageCallback("cart", secondArg);
+                  } else if (event == "remove_cart") {
+                    onMessageCallback("remove_cart", secondArg);
+                  } else if (event == "share") {
+                    print("checkitonce");
+                    List<String> listStr =  List<String>.filled(0,'', growable:true);
+                  listStr = str.split(',');
+                  // for(int i=0;i<listStr.length;i++){
+                  //   print("checkitonce: ${listStr.elementAt(i)}");
+                  // }
+                  String substring = listStr.elementAt(2);
+                    Uint8List _bytes = base64.decode(substring);
+                    Share.file('MirrAR SDK', 'mirrar.jpg', _bytes, 'image/jpg');
+                    onMessageCallback("share", substring);
+                  }
+                });
+          },
+          onConsoleMessage: (controller, consoleMessage) {
+            print("checktest $consoleMessage");
+          },
+          androidOnPermissionRequest: (InAppWebViewController controller,
+              String origin, List<String> resources) async {
+            return PermissionRequestResponse(
+                resources: resources,
+                action: PermissionRequestResponseAction.GRANT);
+          },
+          onDownloadStart: (controller, url) async {
+            print("onDownloadStart $url");
+            onMessageCallback("download", url.toString());
+
+            _createFileFromString(url.toString());
+          },
+        ),
+      );
+    }
     else {
       return Scaffold(
-          backgroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        bottomNavigationBar: Container(
+          height: 50,
+          color: Colors.white,
+          child: InkWell(
+            onTap: () => _exitAppSafari(context),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
+              child: Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  Text('Dismiss'),
+                ],
+              ),
+            ),
+          ),),
+       
           body: Center(
             child: CircularProgressIndicator(
-              backgroundColor: Colors.pink,
+              backgroundColor: Colors.white,
             ),
           ));
     }

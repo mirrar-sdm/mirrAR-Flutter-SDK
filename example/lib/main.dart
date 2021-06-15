@@ -1,8 +1,11 @@
-import 'package:example/LaunchMirrrar.dart';
+// @dart=2.9
 import 'package:flutter/material.dart';
-import 'package:mirrar_sdk/mirrar_sdk.dart';
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
+
+import 'launch_mirrar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

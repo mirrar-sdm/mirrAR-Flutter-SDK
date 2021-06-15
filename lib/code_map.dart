@@ -1,7 +1,8 @@
+// ignore: file_names
 class CodeMap {
-    String type;
-    List<String> items;
-  CodeMap({this.type, this.items});
+    String? type;
+    List<String>? items;
+  CodeMap({required this.type,required this.items});
 
   factory CodeMap.fromJson(Map<String, dynamic> json) {
     return CodeMap(

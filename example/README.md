@@ -1,6 +1,6 @@
-# example
+# plugin_mirrar_example
 
-A new Flutter project.
+Demonstrates how to use the plugin_mirrar plugin.
 
 ## Getting Started
 
