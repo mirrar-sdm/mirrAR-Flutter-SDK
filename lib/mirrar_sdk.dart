@@ -11,9 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:mirrar_sdk/safari_browser.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';import 'package:path_provider/path_provider.dart';
+import 'package:plugin_mirrar/plugin_mirrar.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
 
 import 'code_map.dart';
@@ -49,7 +48,6 @@ class _MyHomePageState extends State<MirrarSDK> {
   final GlobalKey webViewKey = GlobalKey();
   final Completer<InAppWebViewController> _completeController =
   Completer<InAppWebViewController>();
-  final ChromeSafariBrowser browser = new MyChromeSafariBrowser();
   _MyHomePageState({required this.jsonData,required  this.uuid,required  this.onMessageCallback});
 
   @override
@@ -125,7 +123,7 @@ class _MyHomePageState extends State<MirrarSDK> {
   var version = iosInfo.systemVersion;
   if(int.parse(version)<14.3){
    mode="safari";
-   openSafari(baseUrl!);
+   openSafari(showProductMap);
   }
   else{
     setState(() {
@@ -140,34 +138,10 @@ else{
     });
   }
   }
-openSafari(String url) async {
-   var options = {
-  "brandId": "c41ade6a-fd1c-4e8b-ac78-4df64da8ae5f",
-  "productData": {
-  "Bracelets": {
-  "items": ["BR-01", "BR-02", "BR-03"],
-  "type": "wrist"
-  },
-  "Earrings": {
-  "items": ["1503677279384_RIB_2113_1", "CT-2032", "CS2124E"],
-  "type": "ear"
-  },
-  "Rings": {
-  "items": ["RN-01", "RN-013", "RN-01543"],
-  "type": "finger"
-  },
-  "Sets": {
-  "items": ["CS-414"],
-  "type": "set"
-  }
-  }
-};
-    try {
-      final int result = await platform.invokeMethod('goToTryOn', {"options": options});
-      print('Resul: $result');
-    } on PlatformException catch (e) {
-      print("Failed: '${e.message}'.");
-    }
+openSafari(var productData) async {
+ 
+   var options= {"brandId":uuid,"productData":productData};
+   PluginMirrar.launchTyrOn(options);
 }
 
 

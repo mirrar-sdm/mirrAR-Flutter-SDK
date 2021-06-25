@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mirrar_sdk/mirrar_sdk.dart';
+import 'package:plugin_mirrar/mirrar_sdk.dart';
 
 class MirrarPage extends StatefulWidget {
   _CounterPageState createState() => _CounterPageState();
@@ -14,7 +14,7 @@ class _CounterPageState extends State<MirrarPage> {
     return Scaffold(
         body: MirrarSDK(
       jsonData: jsonData,
-      uuid: 'c2f1cc1f-bdf6-43c8-882c-903f66164cc3',
+      uuid: '',
       onMessageCallback: (String event,String message) {
         if (event == "details") {
           //message is the product_code

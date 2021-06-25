@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mirrar_sdk/mirrar_sdk.dart';
+import 'package:plugin_mirrar/plugin_mirrar.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('plugin_mirrar');
@@ -18,6 +18,6 @@ void main() {
   });
 
   // test('getPlatformVersion', () async {
-  //   expect(await Mirr, '42');
+  //   expect(await PluginMirrar.platformVersion, '42');
   // });
 }
