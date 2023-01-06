@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:plugin_mirrar_example/homePage/homeScreen.dart';
 import 'package:plugin_mirrar_example/launch_mirrar.dart';
 import 'package:provider/provider.dart';
 
@@ -11,63 +12,22 @@ Future<void> main() async {
   // await Permission.storage.request();
   await Permission.camera.request();
   await Permission.storage.request();
-  runApp(MyApp());
+  runApp(const App());
 }
 
-class MyApp extends StatelessWidget {
+class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Mirrar Demo',
       theme: ThemeData(
         primarySwatch: Colors.pink,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomeScreen(),
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  
-
-   @override
-  void initState() {
-    super.initState();
-
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-            title: const Text('Mirrar SDK'), backgroundColor: Colors.pink),
-        body: Scaffold(
-            body: SafeArea(
-                child: Center(
-                    child: Container(
-                        width: 200,
-                        height: 50,
-                        child: RaisedButton(
-                          child: Text("Launch Mirrar"),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MirrarPage()));
-                          },
-                          color: Colors.pink,
-                          textColor: Colors.white,
-                          splashColor: Colors.grey,
-                        ))))));
   }
 }

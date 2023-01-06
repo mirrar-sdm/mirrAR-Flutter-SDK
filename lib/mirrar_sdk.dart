@@ -5,50 +5,53 @@ import 'dart:typed_data';
 
 import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';import 'package:path_provider/path_provider.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:modern_form_esys_flutter_share/modern_form_esys_flutter_share.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:plugin_mirrar/plugin_mirrar.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
 
 import 'code_map.dart';
 
-  InAppWebViewController? _webViewController;
+InAppWebViewController? _webViewController;
 String? uuid;
 String? baseUrl;
 bool load = false;
-String mode="webview";
+String mode = "webview";
+
 class MirrarSDK extends StatefulWidget {
   final String uuid;
   final String jsonData;
   final Function(String, String) onMessageCallback;
 
-  MirrarSDK({Key? key, required this.jsonData,required  this.uuid,required  this.onMessageCallback})
+  const MirrarSDK(
+      {Key? key,
+      required this.jsonData,
+      required this.uuid,
+      required this.onMessageCallback})
       : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
   _MyHomePageState createState() => _MyHomePageState(
-      jsonData: jsonData,
-      uuid: uuid,
-      onMessageCallback: onMessageCallback);
+      jsonData: jsonData, uuid: uuid, onMessageCallback: onMessageCallback);
 }
 
 class _MyHomePageState extends State<MirrarSDK> {
-
   final String? jsonData;
   final String? uuid;
-   static const platform = MethodChannel('com.sdk.mirrarflutter/navToTryOn');
-  
+
   final Function(String, String) onMessageCallback;
   final GlobalKey webViewKey = GlobalKey();
-  final Completer<InAppWebViewController> _completeController =
-  Completer<InAppWebViewController>();
-  _MyHomePageState({required this.jsonData,required  this.uuid,required  this.onMessageCallback});
+  _MyHomePageState(
+      {required this.jsonData,
+      required this.uuid,
+      required this.onMessageCallback});
 
   @override
   void initState() {
@@ -60,9 +63,8 @@ class _MyHomePageState extends State<MirrarSDK> {
   }
 
   Future<void> checkAPI() async {
-    Map<String, CodeMap> activeMap = new Map();
-    Map<String, CodeMap> showMap = new Map();
-    Map<String, List<String>> mCodes = new Map();
+    Map<String, CodeMap> showMap = {};
+    Map<String, List<String>> mCodes = {};
 
     Map valueMap = json.decode(jsonData!);
     // print(valueMap);
@@ -78,12 +80,12 @@ class _MyHomePageState extends State<MirrarSDK> {
     showMap.forEach((key, value) {
       // ignore: deprecated_member_use
       // ignore: prefer_collection_literals
-      List<String> codes =  List<String>.filled(0,'', growable:true);
-      value.items!.forEach((element) {
+      List<String> codes = List<String>.filled(0, '', growable: true);
+      for (var element in value.items!) {
         codes.add(element);
-      });
+      }
 
-      if (codes.length > 0) {
+      if (codes.isNotEmpty) {
         mCodes.putIfAbsent(key, () => codes);
       }
     });
@@ -91,7 +93,7 @@ class _MyHomePageState extends State<MirrarSDK> {
 //print(activeMap['Necklaces'].items );
     //print(mCodes.length);
 
-    List<String> codes = List<String>.filled(0,'', growable:true);
+    List<String> codes = List<String>.filled(0, '', growable: true);
     mCodes.forEach((key, value) {
       codes.add("&$key=");
       codes.addAll(value);
@@ -107,65 +109,54 @@ class _MyHomePageState extends State<MirrarSDK> {
         .replaceAll(",&", "&");
 
     setState(() {
-      baseUrl = "https://cdn.styledotme.com/webpack/mirrar.html?brand_id=" +
-          uuid! +
-          csv +
-          "&sku=" +
-          codes.elementAt((codes.length > 0) && codes.contains('#') ? 1 : 0) +
-          "&platform=android-sdk-flutter";
+      baseUrl = "https://cdn.mirrar.com/webpack/mirrar.html?brand_id=${uuid!}$csv&sku=${codes.elementAt((codes.isNotEmpty) && codes.contains('#') ? 1 : 0)}&platform=android-sdk-flutter";
       print(baseUrl);
       load = true;
     });
-     
+
     if (Platform.isIOS) {
-  var iosInfo = await DeviceInfoPlugin().iosInfo;
-  
-  var version = iosInfo.systemVersion;
-  if(int.parse(version)<14.3){
-   mode="safari";
-   openSafari(showProductMap);
-  }
-  else{
-    setState(() {
-      load=true;
-    });
-  }
-  
-}
-else{
-     setState(() {
-      load=true;
-    });
-  }
-  }
-openSafari(var productData) async {
- 
-   var options= {"brandId":uuid,"productData":productData};
-   PluginMirrar.launchTyrOn(options);
-}
+      var iosInfo = await DeviceInfoPlugin().iosInfo;
 
+      var version = iosInfo.systemVersion;
+      if (int.parse(version) < 14.3) {
+        mode = "safari";
+        openSafari(showProductMap);
+      } else {
+        setState(() {
+          load = true;
+        });
+      }
+    } else {
+      setState(() {
+        load = true;
+      });
+    }
+  }
 
+  openSafari(var productData) async {
+    var options = {"brandId": uuid, "productData": productData};
+    PluginMirrar.launchTyrOn(options);
+  }
 
+  Future<bool> _exitApp(BuildContext context) async {
+    if (await _webViewController!.canGoBack()) {
+      print("onwill goback");
+      _webViewController!.goBack();
+      return Future.value(false);
+    } else {
+      Navigator.pop(context);
+      return Future.value(false);
+    }
+  }
 
-Future<bool> _exitApp(BuildContext context) async {
-  if (await _webViewController!.canGoBack()) {
-    print("onwill goback");
-    _webViewController!.goBack();
-    return Future.value(false);
-  } else {
+  Future<bool> _exitAppSafari(BuildContext context) async {
     Navigator.pop(context);
     return Future.value(false);
   }
-}
-Future<bool> _exitAppSafari(BuildContext context) async {
-  
-    Navigator.pop(context);
-    return Future.value(false);
-  
-}
-   @override
+
+  @override
   Widget build(BuildContext context) {
-    if (load){
+    if (load) {
       return Scaffold(
         backgroundColor: Colors.black,
         bottomNavigationBar: Container(
@@ -174,18 +165,19 @@ Future<bool> _exitAppSafari(BuildContext context) async {
           child: InkWell(
             onTap: () => _exitApp(context),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
+              padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
               child: Row(
                 children: <Widget>[
                   Icon(
                     Icons.arrow_back_ios_new,
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
-                  Text('Dismiss'),
+                  const Text('Dismiss'),
                 ],
               ),
             ),
-          ),),
+          ),
+        ),
         body: InAppWebView(
           key: webViewKey,
           initialUrlRequest: URLRequest(url: Uri.parse(baseUrl!)),
@@ -194,22 +186,20 @@ Future<bool> _exitAppSafari(BuildContext context) async {
                 mediaPlaybackRequiresUserGesture: false,
                 useOnDownloadStart: true,
                 useShouldOverrideUrlLoading: true),
-           
           ),
           shouldOverrideUrlLoading: (controller, navigationAction) async {
             var uri = navigationAction.request.url;
             String url = uri.toString();
-            if(url.contains('whatsapp')){
-            int t = url.indexOf('text');
-            int end = url.indexOf('source');
-            String sendUrl = url.substring(t + 5, end - 1);
-            Share.text('MirrAR', '$sendUrl', 'text/plain');
-            onMessageCallback("whatsapp", sendUrl);
-             return NavigationActionPolicy.CANCEL;
+            if (url.contains('whatsapp')) {
+              int t = url.indexOf('text');
+              int end = url.indexOf('source');
+              String sendUrl = url.substring(t + 5, end - 1);
+              Share.text('MirrAR', sendUrl, 'text/plain');
+              onMessageCallback("whatsapp", sendUrl);
+              return NavigationActionPolicy.CANCEL;
+            } else {
+              return NavigationActionPolicy.ALLOW;
             }
-            else
-             return NavigationActionPolicy.ALLOW;
-           
           },
           onWebViewCreated: (InAppWebViewController controller) {
             _webViewController = controller;
@@ -229,25 +219,19 @@ Future<bool> _exitAppSafari(BuildContext context) async {
                       break;
                     }
                   }
-                  int k = 0;
                   String secondArg = '';
-                  int check = 0;
                   for (int i = j + 2; i < str.length; i++) {
                     if (str[i] != ",") {
                       secondArg += str[i];
                     } else {
-                      k = i;
                       break;
                     }
                   }
 
-                  
-                 
-                // print("eventName: $event");
+                  // print("eventName: $event");
                   if (event == "mirrar-popup-closed") {
                     onMessageCallback("mirrar-popup-closed", secondArg);
-                  }
-                  else if (event == "details") {
+                  } else if (event == "details") {
                     onMessageCallback("details", secondArg);
                   } else if (event == "wishlist") {
                     onMessageCallback("wishlist", secondArg);
@@ -259,14 +243,15 @@ Future<bool> _exitAppSafari(BuildContext context) async {
                     onMessageCallback("remove_cart", secondArg);
                   } else if (event == "share") {
                     print("checkitonce");
-                    List<String> listStr =  List<String>.filled(0,'', growable:true);
-                  listStr = str.split(',');
-                  // for(int i=0;i<listStr.length;i++){
-                  //   print("checkitonce: ${listStr.elementAt(i)}");
-                  // }
-                  String substring = listStr.elementAt(2);
-                    Uint8List _bytes = base64.decode(substring);
-                    Share.file('MirrAR SDK', 'mirrar.jpg', _bytes, 'image/jpg');
+                    List<String> listStr =
+                        List<String>.filled(0, '', growable: true);
+                    listStr = str.split(',');
+                    // for(int i=0;i<listStr.length;i++){
+                    //   print("checkitonce: ${listStr.elementAt(i)}");
+                    // }
+                    String substring  = listStr.elementAt(2);
+                    Uint8List bytes = base64.decode(substring);
+                    Share.file('MirrAR SDK', 'mirrar.jpg', bytes, 'image/jpg');
                     onMessageCallback("share", substring);
                   }
                 });
@@ -280,7 +265,7 @@ Future<bool> _exitAppSafari(BuildContext context) async {
                 resources: resources,
                 action: PermissionRequestResponseAction.GRANT);
           },
-          onDownloadStart: (controller, url) async {
+          onDownloadStartRequest: (controller, url) async {
             print("onDownloadStart $url");
             onMessageCallback("download", url.toString());
 
@@ -288,30 +273,29 @@ Future<bool> _exitAppSafari(BuildContext context) async {
           },
         ),
       );
-    }
-    else {
+    } else {
       return Scaffold(
-        backgroundColor: Colors.white,
-        bottomNavigationBar: Container(
-          height: 50,
-          color: Colors.white,
-          child: InkWell(
-            onTap: () => _exitAppSafari(context),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  Text('Dismiss'),
-                ],
+          backgroundColor: Colors.white,
+          bottomNavigationBar: Container(
+            height: 50,
+            color: Colors.white,
+            child: InkWell(
+              onTap: () => _exitAppSafari(context),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    const Text('Dismiss'),
+                  ],
+                ),
               ),
             ),
-          ),),
-       
-          body: Center(
+          ),
+          body: const Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.white,
             ),

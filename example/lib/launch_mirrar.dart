@@ -14,8 +14,8 @@ class _CounterPageState extends State<MirrarPage> {
     return Scaffold(
         body: MirrarSDK(
       jsonData: jsonData,
-      uuid: '',
-      onMessageCallback: (String event,String message) {
+      uuid: 'f1a6c16c-f3d8-49c4-b7b9-8ef57e292357',
+      onMessageCallback: (String event, String message) {
         if (event == "details") {
           //message is the product_code
         } else if (event == "whatsapp") {
@@ -30,9 +30,9 @@ class _CounterPageState extends State<MirrarPage> {
           //message is the product_code
         } else if (event == "remove_cart") {
           //message is the product_code
-        } else if(event=="share"){
+        } else if (event == "share") {
           //message is the image uri
-        }else if (event == "mirrar-popup-closed") {
+        } else if (event == "mirrar-popup-closed") {
           //message is the product_code
         }
       },
