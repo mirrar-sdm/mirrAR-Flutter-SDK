@@ -20,7 +20,10 @@ dependencies:
   
   permission_handler: 10.2.0
   provider: ^5.0.0
+  auto_size_text: ^3.0.0
   checkbox_grouped: ^1.8.1
+  flutter_cache_manager: ^3.3.0
+  cached_network_image: ^3.2.3
 
   plugin_mirrar:
     # When depending on this package from a real application you should use:

@@ -2,19 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:plugin_mirrar/mirrar_sdk.dart';
 
 class MirrarPage extends StatefulWidget {
+  final String jsonData;
+  final String brandID;
+
+  const MirrarPage({Key? key, required this.jsonData, required this.brandID})
+      : super(key: key);
+
+  @override
   _CounterPageState createState() => _CounterPageState();
 }
 
 class _CounterPageState extends State<MirrarPage> {
   int count = 0;
-  String jsonData =
-      "{\"options\":{\"productData\":{\"Earrings\":{\"items\":[\"0079-500x500\",\"0097-500x500\",\"00118-500x500sdfghjk\"],\"type\":\"ear\"},\"Sets\":{\"items\":[\"DSC_0206S\",\"DSC_0204S\"],\"type\":\"set\"}}}\n}";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: MirrarSDK(
-      jsonData: jsonData,
-      uuid: 'f1a6c16c-f3d8-49c4-b7b9-8ef57e292357',
+      jsonData: widget.jsonData,
+      uuid: widget.brandID,
       onMessageCallback: (String event, String message) {
         if (event == "details") {
           //message is the product_code

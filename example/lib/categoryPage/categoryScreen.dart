@@ -1,10 +1,10 @@
-import 'package:checkbox_grouped/checkbox_grouped.dart';
+import 'dart:math';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plugin_mirrar_example/categoryPage/categoryBloc.dart';
-import 'package:plugin_mirrar_example/models/categoriesResponse.dart';
-import 'package:plugin_mirrar_example/models/inventoryResponse.dart';
 import 'package:plugin_mirrar_example/models/manageInventory.dart';
-import 'package:plugin_mirrar_example/models/selectedItemsRequest.dart';
 
 class CategoryScreen extends StatefulWidget {
   final List<ManageInventory> inventory;
@@ -24,57 +24,108 @@ class _CategoryScreenState extends State<CategoryScreen>
 
   Widget cardView(String productCode, String imageUrl, int itemIndex,
       String category, String categoryType) {
-    // for(var i in categoryBloc.selectedProductCodes)
-    // controller.deselectValues(categoryBloc.selectedProductCodes);
-    return Card(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                height: 90,
-                child: Image(
-                  image: NetworkImage(imageUrl),
-                  fit: BoxFit.scaleDown,
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              CheckboxListTile(
-                value: categoryBloc.inventory
+    return GestureDetector(
+      onTap: () => setState(() {
+        categoryBloc.inventory
                     .firstWhere((element) => element.category == category)
                     .inventoryResponse
                     .data[itemIndex]
-                    .isChecked,
-                onChanged: ((value) {
-                  setState(() {
-                    categoryBloc.inventory
+                    .isChecked ==
+                true
+            ? categoryBloc.inventory
+                .firstWhere((element) => element.category == category)
+                .inventoryResponse
+                .data[itemIndex]
+                .isChecked = false
+            : categoryBloc.inventory
+                .firstWhere((element) => element.category == category)
+                .inventoryResponse
+                .data[itemIndex]
+                .isChecked = true;
+      }),
+      child: Card(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (category == "Earrings")
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        height: 70,
+                        child: Transform(
+                            transform: Matrix4.rotationY(pi),
+                            alignment: Alignment.center,
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.scaleDown,
+                            )),
+                      ),
+                      SizedBox(
+                          height: 70,
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.scaleDown,
+                          ))
+                    ],
+                  ),
+                if (category != "Earrings")
+                  SizedBox(
+                      height: 90,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        fit: BoxFit.scaleDown,
+                      )),
+                const SizedBox(
+                  height: 5,
+                ),
+                CheckboxListTile(
+                    value: categoryBloc.inventory
                         .firstWhere((element) => element.category == category)
                         .inventoryResponse
                         .data[itemIndex]
-                        .isChecked = value!;
-                    categoryBloc.inventory
-                        .firstWhere((element) => element.category == category)
-                        .isChecked = value;
-                    print("$category,$itemIndex");
-                  });
-                }),
-                title: Text(
-                  productCode,
-                  textScaleFactor: 0.8,
-                ),
-              )
-            ],
+                        .isChecked,
+                    onChanged: ((value) {
+                      setState(() {
+                        categoryBloc.inventory
+                            .firstWhere(
+                                (element) => element.category == category)
+                            .inventoryResponse
+                            .data[itemIndex]
+                            .isChecked = value!;
+                        if (value) {
+                          if (!categoryBloc.selectedItems
+                              .containsKey(category)) {
+                            categoryBloc.selectedItems[category] = {
+                              "items": [],
+                              "type": categoryType
+                            };
+                          }
+                          categoryBloc.selectedItems[category]!["items"]!
+                              .add(productCode);
+                        } else {
+                          categoryBloc.selectedItems[category]!.remove({
+                            "items": [productCode],
+                          });
+                        }
+                      });
+                    }),
+                    title: AutoSizeText(
+                      productCode,
+                      maxLines: 2,
+                    ))
+              ],
+            ),
           ),
         ),
+        margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
       ),
-      margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
     );
   }
 
