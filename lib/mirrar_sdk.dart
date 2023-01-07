@@ -8,7 +8,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:modern_form_esys_flutter_share/modern_form_esys_flutter_share.dart';
@@ -27,7 +26,7 @@ String mode = "webview";
 class MirrarSDK extends StatefulWidget {
   final String uuid;
   final String jsonData;
-  final Function(String, String) onMessageCallback;
+  final Function(String, String, String) onMessageCallback;
 
   const MirrarSDK(
       {Key? key,
@@ -46,7 +45,7 @@ class _MyHomePageState extends State<MirrarSDK> {
   final String? jsonData;
   final String? uuid;
 
-  final Function(String, String) onMessageCallback;
+  final Function(String, String, String) onMessageCallback;
   final GlobalKey webViewKey = GlobalKey();
   _MyHomePageState(
       {required this.jsonData,
@@ -109,7 +108,8 @@ class _MyHomePageState extends State<MirrarSDK> {
         .replaceAll(",&", "&");
 
     setState(() {
-      baseUrl = "https://cdn.mirrar.com/webpack/mirrar.html?brand_id=${uuid!}$csv&sku=${codes.elementAt((codes.isNotEmpty) && codes.contains('#') ? 1 : 0)}&platform=android-sdk-flutter";
+      baseUrl =
+          "https://cdn.mirrar.com/general/mirrar.html?brand_id=${uuid!}$csv&sku=${codes[1]}&platform=android-sdk-flutter";
       print(baseUrl);
       load = true;
     });
@@ -195,7 +195,7 @@ class _MyHomePageState extends State<MirrarSDK> {
               int end = url.indexOf('source');
               String sendUrl = url.substring(t + 5, end - 1);
               Share.text('MirrAR', sendUrl, 'text/plain');
-              onMessageCallback("whatsapp", sendUrl);
+              onMessageCallback("whatsapp", sendUrl, "");
               return NavigationActionPolicy.CANCEL;
             } else {
               return NavigationActionPolicy.ALLOW;
@@ -208,7 +208,6 @@ class _MyHomePageState extends State<MirrarSDK> {
                 handlerName: 'message',
                 callback: (args) {
                   String str = args.toString();
-                  print("message: asasasaas $str");
                   String event = '';
                   int j = 0;
                   for (int i = 9; i < str.length; i++) {
@@ -228,19 +227,28 @@ class _MyHomePageState extends State<MirrarSDK> {
                     }
                   }
 
+                  String thirdArg = '';
+                  for (int i = j + 2; i < str.length; i++) {
+                    if (str[i] != ",") {
+                      thirdArg += str[i];
+                    } else {
+                      break;
+                    }
+                  }
                   // print("eventName: $event");
                   if (event == "mirrar-popup-closed") {
-                    onMessageCallback("mirrar-popup-closed", secondArg);
+                    onMessageCallback(
+                        "mirrar-popup-closed", secondArg, thirdArg);
                   } else if (event == "details") {
-                    onMessageCallback("details", secondArg);
+                    onMessageCallback("details", secondArg, thirdArg);
                   } else if (event == "wishlist") {
-                    onMessageCallback("wishlist", secondArg);
+                    onMessageCallback("wishlist", secondArg, thirdArg);
                   } else if (event == "unwishlist") {
-                    onMessageCallback("unwishlist", secondArg);
+                    onMessageCallback("unwishlist", secondArg, thirdArg);
                   } else if (event == "cart") {
-                    onMessageCallback("cart", secondArg);
+                    onMessageCallback("cart", secondArg, thirdArg);
                   } else if (event == "remove_cart") {
-                    onMessageCallback("remove_cart", secondArg);
+                    onMessageCallback("remove_cart", secondArg, thirdArg);
                   } else if (event == "share") {
                     print("checkitonce");
                     List<String> listStr =
@@ -249,10 +257,10 @@ class _MyHomePageState extends State<MirrarSDK> {
                     // for(int i=0;i<listStr.length;i++){
                     //   print("checkitonce: ${listStr.elementAt(i)}");
                     // }
-                    String substring  = listStr.elementAt(2);
+                    String substring = listStr.elementAt(2);
                     Uint8List bytes = base64.decode(substring);
                     Share.file('MirrAR SDK', 'mirrar.jpg', bytes, 'image/jpg');
-                    onMessageCallback("share", substring);
+                    onMessageCallback("share", substring, "");
                   }
                 });
           },
@@ -267,7 +275,7 @@ class _MyHomePageState extends State<MirrarSDK> {
           },
           onDownloadStartRequest: (controller, url) async {
             print("onDownloadStart $url");
-            onMessageCallback("download", url.toString());
+            onMessageCallback("download", url.toString(), "");
 
             _createFileFromString(url.toString());
           },

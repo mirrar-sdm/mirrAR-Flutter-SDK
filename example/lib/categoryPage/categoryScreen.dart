@@ -4,10 +4,11 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:plugin_mirrar_example/categoryPage/categoryBloc.dart';
+import 'package:plugin_mirrar_example/models/dynamicInventory.dart';
 import 'package:plugin_mirrar_example/models/manageInventory.dart';
 
 class CategoryScreen extends StatefulWidget {
-  final List<ManageInventory> inventory;
+  final List<DynamicInventory> inventory;
   final String brandId;
 
   const CategoryScreen(
@@ -45,14 +46,37 @@ class _CategoryScreenState extends State<CategoryScreen>
       }),
       child: Card(
         child: Container(
+          width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15.0),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(1.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                if (category == "Sets")
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        height: 70,
+                        child: Transform(
+                            transform: Matrix4.rotationY(pi),
+                            alignment: Alignment.center,
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.scaleDown,
+                            )),
+                      ),
+                      SizedBox(
+                          height: 70,
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.scaleDown,
+                          ))
+                    ],
+                  ),
                 if (category == "Earrings")
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -80,6 +104,143 @@ class _CategoryScreenState extends State<CategoryScreen>
                       height: 90,
                       child: CachedNetworkImage(
                         imageUrl: imageUrl,
+                        fit: BoxFit.scaleDown,
+                      )),
+                const SizedBox(
+                  height: 5,
+                ),
+                CheckboxListTile(
+                    value: categoryBloc.inventory
+                        .firstWhere((element) => element.category == category)
+                        .inventoryResponse
+                        .data[itemIndex]
+                        .isChecked,
+                    onChanged: ((value) {
+                      setState(() {
+                        categoryBloc.inventory
+                            .firstWhere(
+                                (element) => element.category == category)
+                            .inventoryResponse
+                            .data[itemIndex]
+                            .isChecked = value!;
+                        if (value) {
+                          if (!categoryBloc.selectedItems
+                              .containsKey(category)) {
+                            categoryBloc.selectedItems[category] = {
+                              "items": [],
+                              "type": categoryType
+                            };
+                          }
+                          categoryBloc.selectedItems[category]!["items"]!
+                              .add(productCode);
+                        } else {
+                          categoryBloc.selectedItems[category]!.remove({
+                            "items": [productCode],
+                          });
+                        }
+                      });
+                    }),
+                    title: AutoSizeText(
+                      productCode,
+                      maxLines: 2,
+                    ))
+              ],
+            ),
+          ),
+        ),
+        margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+      ),
+    );
+  }
+
+  Widget cardView2(String productCode, String imageUrl1, String imageUrl2,
+      int itemIndex, String category, String categoryType) {
+    return GestureDetector(
+      onTap: () => setState(() {
+        categoryBloc.inventory
+                    .firstWhere((element) => element.category == category)
+                    .inventoryResponse
+                    .data[itemIndex]
+                    .isChecked ==
+                true
+            ? categoryBloc.inventory
+                .firstWhere((element) => element.category == category)
+                .inventoryResponse
+                .data[itemIndex]
+                .isChecked = false
+            : categoryBloc.inventory
+                .firstWhere((element) => element.category == category)
+                .inventoryResponse
+                .data[itemIndex]
+                .isChecked = true;
+      }),
+      child: Card(
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                if (categoryType == "set")
+                  SizedBox(
+                      height: 50,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl2,
+                        fit: BoxFit.scaleDown,
+                      )),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      height: 40,
+                      child: Transform(
+                          transform: Matrix4.rotationY(pi),
+                          alignment: Alignment.center,
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl1,
+                            // placeholder:,
+                            fit: BoxFit.scaleDown,
+                          )),
+                    ),
+                    SizedBox(
+                        height: 40,
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl1,
+                          fit: BoxFit.scaleDown,
+                        ))
+                  ],
+                ),
+                if (categoryType == "ear")
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        height: 70,
+                        child: Transform(
+                            transform: Matrix4.rotationY(pi),
+                            alignment: Alignment.center,
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl1,
+                              fit: BoxFit.scaleDown,
+                            )),
+                      ),
+                      SizedBox(
+                          height: 70,
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl1,
+                            fit: BoxFit.scaleDown,
+                          ))
+                    ],
+                  ),
+                if (categoryType != "ear" && categoryType != "set")
+                  SizedBox(
+                      height: 90,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl1,
                         fit: BoxFit.scaleDown,
                       )),
                 const SizedBox(
@@ -187,6 +348,22 @@ class _CategoryScreenState extends State<CategoryScreen>
                         child: Text("No Data Found"),
                       );
                     }
+
+                    if (i.categoryType == "set") {
+                      var earKey = i.setData["earring_data"];
+                      var neckKey = i.setData["necklace_data"];
+
+                      return cardView2(
+                          i.inventoryResponse.data[index].productCode,
+                          i.inventoryResponse.data[index].rawData[earKey]
+                              ["data"]["image_url"],
+                          i.inventoryResponse.data[index].rawData[neckKey]
+                              ["data"]["image_url"],
+                          index,
+                          i.category,
+                          i.categoryType);
+                    }
+
                     return cardView(
                         i.inventoryResponse.data[index].productCode,
                         i.inventoryResponse.data[index].data.imageUrl,

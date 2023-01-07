@@ -3,14 +3,14 @@ import 'dart:convert';
 import 'package:checkbox_grouped/checkbox_grouped.dart';
 import 'package:flutter/material.dart';
 import 'package:plugin_mirrar_example/launch_mirrar.dart';
+import 'package:plugin_mirrar_example/models/dynamicInventory.dart';
 import 'package:plugin_mirrar_example/models/manageInventory.dart';
-
 
 class CategoryBloc {
   BuildContext context;
   String brandId;
   late String jsonData;
-  List<ManageInventory> inventory;
+  List<DynamicInventory> inventory;
   late TabController tabController;
   List<Tab> tabs = [];
   GroupController controller = GroupController();
