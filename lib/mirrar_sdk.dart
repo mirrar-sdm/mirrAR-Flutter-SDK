@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MirrarSDK> {
 
     setState(() {
       baseUrl =
-          "https://cdn.mirrar.com/general/mirrar.html?brand_id=${uuid!}$csv&sku=${codes[1]}&platform=android-sdk-flutter";
+          "https://cdn.mirrar.com/general/mirrar.html?brand_id=${uuid!}$csv&sku=${codes[1] ?? ""}&platform=android-sdk-flutter";
       print(baseUrl);
       load = true;
     });

@@ -24,36 +24,36 @@ class HomeBloc {
   void init() {}
 
   void onSubmit() async {
-    // try {
-    // // start loading
-    // if (!loadingCtrl.isClosed) loadingCtrl.sink.add(true);
-    commonMethods = CommonMethods(brandId: brandIdController.text);
-    categories = await commonMethods.getCategories();
-    for (var category in categories.data) {
-      var response = await commonMethods.getInventory(
-          category: category.label, type: category.type);
-      inventories.add(DynamicInventory(
-          setData: response.setData,
-          inventoryResponse: response.inventoryResponse,
-          category: category.label,
-          categoryType: category.type));
+    try {
+      // start loading
+      if (!loadingCtrl.isClosed) loadingCtrl.sink.add(true);
+      commonMethods = CommonMethods(brandId: brandIdController.text);
+      categories = await commonMethods.getCategories();
+      for (var category in categories.data) {
+        var response = await commonMethods.getInventory(
+            category: category.label, type: category.type);
+        inventories.add(DynamicInventory(
+            setData: response.setData,
+            inventoryResponse: response.inventoryResponse,
+            category: category.label,
+            categoryType: category.type));
+      }
+      Navigator.push(
+          _context,
+          MaterialPageRoute(
+              builder: ((context) => CategoryScreen(
+                    inventory: inventories,
+                    brandId: brandIdController.text,
+                  ))));
+    } on ErrorResponse catch (error) {
+      CommonWidgets.errorDialog(_context, error.meta.message);
+      if (!loadingCtrl.isClosed) loadingCtrl.sink.add(false);
+    } catch (exception) {
+      CommonWidgets.errorDialog(_context, exception.toString());
+      if (!loadingCtrl.isClosed) loadingCtrl.sink.add(false);
+    } finally {
+      // stop loading
+      if (!loadingCtrl.isClosed) loadingCtrl.sink.add(false);
     }
-    Navigator.push(
-        _context,
-        MaterialPageRoute(
-            builder: ((context) => CategoryScreen(
-                  inventory: inventories,
-                  brandId: brandIdController.text,
-                ))));
-    // } on ErrorResponse catch (error) {
-    //   CommonWidgets.errorDialog(_context, error.meta.message);
-    //   if (!loadingCtrl.isClosed) loadingCtrl.sink.add(false);
-    // } catch (exception) {
-    //   CommonWidgets.errorDialog(_context, exception.toString());
-    //   if (!loadingCtrl.isClosed) loadingCtrl.sink.add(false);
-    // } finally {
-    //   // stop loading
-    //   if (!loadingCtrl.isClosed) loadingCtrl.sink.add(false);
-    // }
   }
 }

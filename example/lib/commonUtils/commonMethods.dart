@@ -17,9 +17,9 @@ class CommonMethods {
     Map<String, dynamic> response;
     //#region Region - Execute Request
     response = await httpService.apiCallGet(
-        apiUrl: "https://m.mirrar.com/api/v1/brands/$brandId/categories",
-        timeOut: 60,
-        headerData: null);
+      apiUrl: "https://m.mirrar.com/api/v1/brands/$brandId/categories",
+      timeOut: 60,
+    );
 
     return CategoriesResponse.fromJson(response);
   }
@@ -43,6 +43,69 @@ class CommonMethods {
             "https://m.mirrar.com/api/v1/brands/$brandId/categories/$category/inventories",
         formData: map,
         timeOut: 60,
+        headerData: null);
+
+    // function to add sets data
+    void addSetsData(List<dynamic> metadata) {
+      // fetching for earring_data
+      for (var metaElement
+          in metadata.where((element) => element["type"] == "ear")) {
+        var key = metaElement["data_key"];
+        print(response["data"][0][key]);
+        dataKeys["earring_data"] = key;
+      }
+
+      // fetching for necklace_data
+      for (var metaElement
+          in metadata.where((element) => element["type"] == "neck")) {
+        var key = metaElement["data_key"];
+        dataKeys["necklace_data"] = key;
+      }
+    }
+
+    List<dynamic> getSetMeta(data, type) {
+      if (type == "set" && data.length > 0) {
+        var product = data[0];
+        var setMetas = product['meta'];
+        return setMetas;
+      }
+      return [];
+    }
+
+    var setsMeta = getSetMeta(response["data"], type);
+    if (setsMeta.length > 0) {
+      addSetsData(setsMeta);
+    }
+
+    return DynamicInventory(
+        inventoryResponse: InventoryResponse.fromJson(response),
+        category: "",
+        categoryType: "",
+        setData: dataKeys);
+  }
+
+  Future<DynamicInventory> getInventorybyPage(
+      {required String category,
+      required String type,
+      required int pageNo}) async {
+    Map<String, dynamic> response;
+
+    Map<String, String> dataKeys = {"earring_data": "", "necklace_data": ""};
+
+    var map = <String, dynamic>{};
+    map['limit'] = "24";
+    map['filter_field[disable]'] = "0";
+    map['filter_field[isSetOnly]'] = "0";
+    map['sort_field'] = "order_key";
+    map['sort_by'] = "asc";
+    map['page'] = pageNo.toString();
+
+    //#region Region - Execute Request
+    response = await httpService.apiCallPost(
+        apiUrl:
+            "https://m.mirrar.com/api/v1/brands/$brandId/categories/$category/inventories",
+        formData: map,
+        timeOut: 2,
         headerData: null);
 
     // function to add sets data

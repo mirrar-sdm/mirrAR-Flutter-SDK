@@ -23,6 +23,23 @@ class _CategoryScreenState extends State<CategoryScreen>
     with SingleTickerProviderStateMixin {
   late CategoryBloc categoryBloc;
 
+  Widget loading() {
+    return StreamBuilder<bool>(
+        stream: categoryBloc.loadingCtrl.stream,
+        builder: (context, snapshot) {
+          if (snapshot.data == false) {
+            return const Material(
+                color: Color(0xff70000000),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.pink,
+                  ),
+                ));
+          }
+          return Container();
+        });
+  }
+
   Widget cardView(String productCode, String imageUrl, int itemIndex,
       String category, String categoryType) {
     return GestureDetector(
@@ -43,6 +60,23 @@ class _CategoryScreenState extends State<CategoryScreen>
                 .inventoryResponse
                 .data[itemIndex]
                 .isChecked = true;
+        if (categoryBloc.inventory
+            .firstWhere((element) => element.category == category)
+            .inventoryResponse
+            .data[itemIndex]
+            .isChecked) {
+          if (!categoryBloc.selectedItems.containsKey(category)) {
+            categoryBloc.selectedItems[category] = {
+              "items": [],
+              "type": categoryType
+            };
+          }
+          categoryBloc.selectedItems[category]!["items"]!.add(productCode);
+        } else {
+          categoryBloc.selectedItems[category]!.remove({
+            "items": [productCode],
+          });
+        }
       }),
       child: Card(
         child: Container(
@@ -55,7 +89,7 @@ class _CategoryScreenState extends State<CategoryScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                if (category == "Sets")
+                if (categoryType == "ear")
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -66,6 +100,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                             alignment: Alignment.center,
                             child: CachedNetworkImage(
                               imageUrl: imageUrl,
+                              placeholder: (context, url) =>
+                                  const Icon(Icons.warning),
+                              errorWidget: (context, url, error) =>
+                                  new Icon(Icons.warning),
                               fit: BoxFit.scaleDown,
                             )),
                       ),
@@ -77,33 +115,15 @@ class _CategoryScreenState extends State<CategoryScreen>
                           ))
                     ],
                   ),
-                if (category == "Earrings")
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      SizedBox(
-                        height: 70,
-                        child: Transform(
-                            transform: Matrix4.rotationY(pi),
-                            alignment: Alignment.center,
-                            child: CachedNetworkImage(
-                              imageUrl: imageUrl,
-                              fit: BoxFit.scaleDown,
-                            )),
-                      ),
-                      SizedBox(
-                          height: 70,
-                          child: CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.scaleDown,
-                          ))
-                    ],
-                  ),
-                if (category != "Earrings")
+                if (categoryType != "ear")
                   SizedBox(
                       height: 90,
                       child: CachedNetworkImage(
                         imageUrl: imageUrl,
+                        errorWidget: (context, url, error) =>
+                            new Icon(Icons.warning),
+                        placeholder: (context, url) =>
+                            const Icon(Icons.warning),
                         fit: BoxFit.scaleDown,
                       )),
                 const SizedBox(
@@ -173,6 +193,24 @@ class _CategoryScreenState extends State<CategoryScreen>
                 .inventoryResponse
                 .data[itemIndex]
                 .isChecked = true;
+
+        if (categoryBloc.inventory
+            .firstWhere((element) => element.category == category)
+            .inventoryResponse
+            .data[itemIndex]
+            .isChecked) {
+          if (!categoryBloc.selectedItems.containsKey(category)) {
+            categoryBloc.selectedItems[category] = {
+              "items": [],
+              "type": categoryType
+            };
+          }
+          categoryBloc.selectedItems[category]!["items"]!.add(productCode);
+        } else {
+          categoryBloc.selectedItems[category]!.remove({
+            "items": [productCode],
+          });
+        }
       }),
       child: Card(
         child: Container(
@@ -190,6 +228,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                       height: 50,
                       child: CachedNetworkImage(
                         imageUrl: imageUrl2,
+                        errorWidget: (context, url, error) =>
+                            new Icon(Icons.warning),
+                        placeholder: (context, url) =>
+                            const Icon(Icons.warning),
                         fit: BoxFit.scaleDown,
                       )),
                 Row(
@@ -202,9 +244,11 @@ class _CategoryScreenState extends State<CategoryScreen>
                           alignment: Alignment.center,
                           child: CachedNetworkImage(
                             imageUrl: imageUrl1,
-                            // placeholder:,
                             fit: BoxFit.scaleDown,
                           )),
+                    ),
+                    const SizedBox(
+                      width: 40,
                     ),
                     SizedBox(
                         height: 40,
@@ -309,7 +353,7 @@ class _CategoryScreenState extends State<CategoryScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: body(),
+      body: Stack(children: [body(), loading()]),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           categoryBloc.onSubmit();
@@ -335,45 +379,61 @@ class _CategoryScreenState extends State<CategoryScreen>
                 unselectedLabelColor: Colors.grey,
               )),
           Expanded(
-            child:
-                TabBarView(controller: categoryBloc.tabController, children: [
-              for (var i in categoryBloc.inventory)
-                GridView.builder(
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  itemBuilder: (_, index) {
-                    if (i.inventoryResponse.data.isEmpty) {
-                      return const Center(
-                        child: Text("No Data Found"),
-                      );
-                    }
+            child: StreamBuilder<bool>(
+                initialData: true,
+                stream: categoryBloc.loadingCtrl.stream,
+                builder: (context, value) {
+                  if (value.hasData && value.data == true) {
+                    return TabBarView(
+                        controller: categoryBloc.tabController,
+                        children: [
+                          for (var i in categoryBloc.inventory)
+                            GridView.builder(
+                              controller: categoryBloc.gridScrollController,
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2),
+                              itemBuilder: (_, index) {
+                                if (i.inventoryResponse.data.isEmpty) {
+                                  return const Center(
+                                    child: Text("No Data Found"),
+                                  );
+                                }
+                                if (i.categoryType == "set") {
+                                  var earKey = i.setData["earring_data"];
+                                  var neckKey = i.setData["necklace_data"];
 
-                    if (i.categoryType == "set") {
-                      var earKey = i.setData["earring_data"];
-                      var neckKey = i.setData["necklace_data"];
+                                  return cardView2(
+                                      i.inventoryResponse.data[index]
+                                          .productCode,
+                                      i.inventoryResponse.data[index]
+                                                  .rawData[earKey]["data"]
+                                              ["image_url"] ??
+                                          "",
+                                      i.inventoryResponse.data[index]
+                                                  .rawData[neckKey]["data"]
+                                              ["image_url"] ??
+                                          "",
+                                      index,
+                                      i.category,
+                                      i.categoryType);
+                                }
 
-                      return cardView2(
-                          i.inventoryResponse.data[index].productCode,
-                          i.inventoryResponse.data[index].rawData[earKey]
-                              ["data"]["image_url"],
-                          i.inventoryResponse.data[index].rawData[neckKey]
-                              ["data"]["image_url"],
-                          index,
-                          i.category,
-                          i.categoryType);
-                    }
-
-                    return cardView(
-                        i.inventoryResponse.data[index].productCode,
-                        i.inventoryResponse.data[index].data.imageUrl,
-                        index,
-                        i.category,
-                        i.categoryType);
-                  },
-                  itemCount: i.inventoryResponse.data.length,
-                ),
-            ]),
+                                return cardView(
+                                    i.inventoryResponse.data[index].productCode,
+                                    i.inventoryResponse.data[index].data
+                                        .imageUrl,
+                                    index,
+                                    i.category,
+                                    i.categoryType);
+                              },
+                              itemCount: i.inventoryResponse.data.length,
+                            ),
+                        ]);
+                  }
+                  return Container();
+                }),
           )
         ],
       ),

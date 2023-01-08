@@ -8,7 +8,6 @@ class HttpService {
   Future<Map<String, dynamic>> apiCallGet({
     required String apiUrl,
     required int timeOut,
-    required var headerData,
   }) async {
     Map<String, dynamic> jsonResponse;
     //  parsed Url
@@ -27,7 +26,7 @@ class HttpService {
     // endregion
 
     // decode json
-    print("Url: $apiUrl\n\nheader: $headerData\n\nResponse: ${response.body}");
+    print("Url: $apiUrl\n\nResponse: ${response.body}");
     jsonResponse = json.decode(response.body.toString());
 
     return jsonResponse;
