@@ -111,6 +111,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                           height: 70,
                           child: CachedNetworkImage(
                             imageUrl: imageUrl,
+                            placeholder: (context, url) =>
+                                const Icon(Icons.warning),
+                            errorWidget: (context, url, error) =>
+                                new Icon(Icons.warning),
                             fit: BoxFit.scaleDown,
                           ))
                     ],
@@ -243,6 +247,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                           transform: Matrix4.rotationY(pi),
                           alignment: Alignment.center,
                           child: CachedNetworkImage(
+                            placeholder: (context, url) =>
+                                const Icon(Icons.warning),
+                            errorWidget: (context, url, error) =>
+                                new Icon(Icons.warning),
                             imageUrl: imageUrl1,
                             fit: BoxFit.scaleDown,
                           )),
@@ -253,6 +261,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                     SizedBox(
                         height: 40,
                         child: CachedNetworkImage(
+                          placeholder: (context, url) =>
+                              const Icon(Icons.warning),
+                          errorWidget: (context, url, error) =>
+                              new Icon(Icons.warning),
                           imageUrl: imageUrl1,
                           fit: BoxFit.scaleDown,
                         ))
@@ -268,6 +280,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                             transform: Matrix4.rotationY(pi),
                             alignment: Alignment.center,
                             child: CachedNetworkImage(
+                              placeholder: (context, url) =>
+                                  const Icon(Icons.warning),
+                              errorWidget: (context, url, error) =>
+                                  new Icon(Icons.warning),
                               imageUrl: imageUrl1,
                               fit: BoxFit.scaleDown,
                             )),
@@ -275,6 +291,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                       SizedBox(
                           height: 70,
                           child: CachedNetworkImage(
+                            placeholder: (context, url) =>
+                                const Icon(Icons.warning),
+                            errorWidget: (context, url, error) =>
+                                new Icon(Icons.warning),
                             imageUrl: imageUrl1,
                             fit: BoxFit.scaleDown,
                           ))
@@ -284,6 +304,10 @@ class _CategoryScreenState extends State<CategoryScreen>
                   SizedBox(
                       height: 90,
                       child: CachedNetworkImage(
+                        placeholder: (context, url) =>
+                            const Icon(Icons.warning),
+                        errorWidget: (context, url, error) =>
+                            new Icon(Icons.warning),
                         imageUrl: imageUrl1,
                         fit: BoxFit.scaleDown,
                       )),
@@ -390,6 +414,7 @@ class _CategoryScreenState extends State<CategoryScreen>
                           for (var i in categoryBloc.inventory)
                             GridView.builder(
                               controller: categoryBloc.gridScrollController,
+                              key: PageStorageKey<String>(i.category),
                               shrinkWrap: true,
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(

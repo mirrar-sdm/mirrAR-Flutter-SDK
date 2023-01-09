@@ -24,7 +24,6 @@ class CategoryBloc {
   late CommonMethods commonMethods;
   ScrollController gridScrollController = ScrollController();
   List<DynamicInventory> inventories = [];
-  late double offsetValue;
 
   final loadingCtrl = StreamController<bool>.broadcast();
 
@@ -44,7 +43,6 @@ class CategoryBloc {
       if (gridScrollController.hasClients) {
         if (gridScrollController.position.maxScrollExtent ==
             gridScrollController.offset) {
-          offsetValue = gridScrollController.offset;
           pageNo += 1;
           fetchDataPage();
         }
