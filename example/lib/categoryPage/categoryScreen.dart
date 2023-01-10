@@ -73,9 +73,7 @@ class _CategoryScreenState extends State<CategoryScreen>
           }
           categoryBloc.selectedItems[category]!["items"]!.add(productCode);
         } else {
-          categoryBloc.selectedItems[category]!.remove({
-            "items": [productCode],
-          });
+          categoryBloc.selectedItems[category]!["items"]!.remove(productCode);
         }
       }),
       child: Card(
@@ -158,9 +156,8 @@ class _CategoryScreenState extends State<CategoryScreen>
                           categoryBloc.selectedItems[category]!["items"]!
                               .add(productCode);
                         } else {
-                          categoryBloc.selectedItems[category]!.remove({
-                            "items": [productCode],
-                          });
+                          categoryBloc.selectedItems[category]!["items"]!
+                              .remove(productCode);
                         }
                       });
                     }),
@@ -211,9 +208,7 @@ class _CategoryScreenState extends State<CategoryScreen>
           }
           categoryBloc.selectedItems[category]!["items"]!.add(productCode);
         } else {
-          categoryBloc.selectedItems[category]!.remove({
-            "items": [productCode],
-          });
+          categoryBloc.selectedItems[category]!["items"]!.remove(productCode);
         }
       }),
       child: Card(
@@ -339,9 +334,8 @@ class _CategoryScreenState extends State<CategoryScreen>
                           categoryBloc.selectedItems[category]!["items"]!
                               .add(productCode);
                         } else {
-                          categoryBloc.selectedItems[category]!.remove({
-                            "items": [productCode],
-                          });
+                          categoryBloc.selectedItems[category]!["items"]!
+                              .remove(productCode);
                         }
                       });
                     }),
