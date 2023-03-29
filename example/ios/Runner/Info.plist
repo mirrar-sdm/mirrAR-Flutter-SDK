@@ -26,6 +26,14 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow Camera to  Photo to  Manage Users section in the app. </string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow  Photo to  Manage Users section in the app. </string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow  Photo to  Manage Users section in the app. </string>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
