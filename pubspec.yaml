@@ -15,7 +15,7 @@ dependencies:
   flutter_inappwebview: ^5.3.2
   permission_handler: ^5.1.0+2
   esys_flutter_share: ^1.0.2
-  url_launcher: ^6.0.5
+  url_launcher: ^5.4.5
   device_info: ^2.0.2
   http: ^0.13.3
   flutter_webview_plugin: ^0.4.0
