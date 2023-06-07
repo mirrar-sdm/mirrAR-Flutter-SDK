@@ -178,7 +178,7 @@ Future<bool> _exitAppSafari(BuildContext context) async {
               child: Row(
                 children: <Widget>[
                   Icon(
-                    Icons.arrow_back_ios_new,
+                    Icons.arrow_back_ios,
                     color: Theme.of(context).accentColor,
                   ),
                   Text('Dismiss'),
@@ -302,7 +302,7 @@ Future<bool> _exitAppSafari(BuildContext context) async {
               child: Row(
                 children: <Widget>[
                   Icon(
-                    Icons.arrow_back_ios_new,
+                    Icons.arrow_back_ios,
                     color: Theme.of(context).accentColor,
                   ),
                   Text('Dismiss'),
