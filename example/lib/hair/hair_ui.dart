@@ -352,7 +352,6 @@ final response = jsonDecode(responseJson);
                 setState(() {
                   resultImageUrl=imageUrl;
                 _isUploading = false;
-                 _selectedImage=null;
               });
 
                 print("response: $responseJson");
