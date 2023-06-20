@@ -11,10 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';import 'package:path_provider/path_provider.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:plugin_mirrar/plugin_mirrar.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'code_map.dart';
 
   InAppWebViewController? _webViewController;
@@ -22,321 +24,148 @@ String? uuid;
 String? baseUrl;
 bool load = false;
 String mode="webview";
-class MirrarSDK extends StatefulWidget {
-  final String uuid;
-  final String jsonData;
-  final Function(String, String) onMessageCallback;
+class MirrarSDK  {
+  
+  static Future<String> myApiFunction(String _base64String) async {
+    // Make the API call with the provided argument and return the result
+    return await callSkinAPI(_base64String);
+  }
 
-  MirrarSDK({Key? key, required this.jsonData,required  this.uuid,required  this.onMessageCallback})
-      : super(key: key);
+  static Future<String> getSubBrandId(String brandId) async {
+    // Make the API call with the provided argument and return the result
+    return await fetchSubBrandId(brandId);
+  }
 
-  @override
-  // ignore: no_logic_in_create_state
-  _MyHomePageState createState() => _MyHomePageState(
-      jsonData: jsonData,
-      uuid: uuid,
-      onMessageCallback: onMessageCallback);
+  static Future<String> fetchHairStyle() async {
+    // Make the API call with the provided argument and return the result
+    return await getHairStyles();
+  }
+
+   static Future<String> uploadImageToServer() async {
+    // Make the API call with the provided argument and return the result
+    return await uploadImage();
+  }
+
+   static Future<String> getImageFilter(String imagePath, String imageId) async {
+    // Make the API call with the provided argument and return the result
+    return await getImageTryOnResponse(imagePath,imageId);
+  }
+
 }
 
-class _MyHomePageState extends State<MirrarSDK> {
+ Future<String> callSkinAPI(String _base64String) async {
+    if (_base64String == null) return throw Exception('API call failed with status: Null string}');
 
-  final String? jsonData;
-  final String? uuid;
-   static const platform = MethodChannel('com.sdk.mirrarflutter/navToTryOn');
+    final url = Uri.parse('https://api.lakme.mirrar.com/webhook/skin/analysis');
+    final headers = {'Content-Type': 'application/json'};
+
+    final currentDate = DateTime.now();
+    final fileNameString = 'image_${currentDate.year}${currentDate.month}${currentDate.day}${currentDate.hour}${currentDate.minute}${currentDate.second}.png';
+
+    final body = json.encode({
+      'image': _base64String,
+      'name': fileNameString,
+    });
+
+    final response = await http.post(url, headers: headers, body: body);
+      print('Request failed with status: ${response.body}');
+
+    if (response.statusCode == 200) {
+      // Request successful
+      final jsonResponse = json.decode(response.body);
+      return response.body;
   
-  final Function(String, String) onMessageCallback;
-  final GlobalKey webViewKey = GlobalKey();
-  final Completer<InAppWebViewController> _completeController =
-  Completer<InAppWebViewController>();
-  _MyHomePageState({required this.jsonData,required  this.uuid,required  this.onMessageCallback});
+    } else {
+      // Request failed
+          throw Exception('API call failed with status: ${response.statusCode}');
 
-  @override
-  void initState() {
-    super.initState();
-    if (Platform.isAndroid) {
-      webview.WebView.platform = webview.SurfaceAndroidWebView();
     }
-    checkAPI();
   }
 
-  Future<void> checkAPI() async {
-    Map<String, CodeMap> activeMap = new Map();
-    Map<String, CodeMap> showMap = new Map();
-    Map<String, List<String>> mCodes = new Map();
+  Future<String> fetchSubBrandId(String brandId) async {
+     String url = 'https://api.lakme.mirrar.com/brand/beauty/id-login';
+  Map<String, String> requestBody = {
+    'brand_id': brandId,
+  };
+  try {
+    var response = await http.post(Uri.parse(url), body: jsonEncode(requestBody));
 
-    Map valueMap = json.decode(jsonData!);
-    // print(valueMap);
-    //print(valueMap['options']['productData']);
-
-    var showProductMap =
-        valueMap['options']['productData'] as Map<String, dynamic>;
-
-    for (String key in showProductMap.keys) {
-      showMap.putIfAbsent(key, () => CodeMap.fromJson(showProductMap[key]));
+    if (response.statusCode == 200) {
+      var responseData = response.body;
+      // Process the responseData here
+      return responseData;
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+       throw Exception('API call failed with status: ${response.statusCode}');
     }
-
-    showMap.forEach((key, value) {
-      // ignore: deprecated_member_use
-      // ignore: prefer_collection_literals
-      List<String> codes =  List<String>.filled(0,'', growable:true);
-      value.items!.forEach((element) {
-        codes.add(element);
-      });
-
-      if (codes.length > 0) {
-        mCodes.putIfAbsent(key, () => codes);
-      }
-    });
-
-//print(activeMap['Necklaces'].items );
-    //print(mCodes.length);
-
-    List<String> codes = List<String>.filled(0,'', growable:true);
-    mCodes.forEach((key, value) {
-      codes.add("&$key=");
-      codes.addAll(value);
-    });
-
-    print(codes.toString());
-    String csv = codes
-        .toString()
-        .replaceAll("[", "")
-        .replaceAll("]", "")
-        .replaceAll(", ", ",")
-        .replaceAll("=,", "=")
-        .replaceAll(",&", "&");
-
-    setState(() {
-      baseUrl = "https://cdn.styledotme.com/webpack/mirrar.html?brand_id=" +
-          uuid! +
-          csv +
-          "&sku=" +
-          codes.elementAt((codes.length > 0) && codes.contains('#') ? 1 : 0) +
-          "&platform=android-sdk-flutter";
-      print(baseUrl);
-      load = true;
-    });
-     
-    if (Platform.isIOS) {
-  var iosInfo = await DeviceInfoPlugin().iosInfo;
-  
-  var version = iosInfo.systemVersion;
-  if(int.parse(version)<14.3){
-   mode="safari";
-   openSafari(showProductMap);
+  } catch (error) {
+     throw Exception('API call failed with status: $error');
   }
-  else{
-    setState(() {
-      load=true;
-    });
-  }
-  
-}
-else{
-     setState(() {
-      load=true;
-    });
-  }
-  }
-openSafari(var productData) async {
- 
-   var options= {"brandId":uuid,"productData":productData};
-   PluginMirrar.launchTyrOn(options);
 }
 
 
+Future<String> getHairStyles() async {
+  var url = Uri.parse('https://api.lakme.mirrar.com/hairstylecolor/hairType/all/brand/ec3e6733-cdd4-474f-b01d-c073655fa105/subBrandId/a9562e09-7a61-472f-a1f7-e719c897e97c');
+  
+  try {
+    var response = await http.get(url);
 
+    if (response.statusCode == 200) {
+      // API call successful, you can handle the response here
+      print(response.body);
+      return response.body;
+    } else {
+      // API call failed, handle the error
+      print('API request failed with status code: ${response.statusCode}');
+      throw Exception('API call failed with status: ${response.statusCode}');
+    }
+  } catch (error) {
+    // Exception occurred during API call
+    print('API request failed with error: $error');
+    throw Exception('API call failed with status: $error');
+  }
+}
 
-Future<bool> _exitApp(BuildContext context) async {
-  if (await _webViewController!.canGoBack()) {
-    print("onwill goback");
-    _webViewController!.goBack();
-    return Future.value(false);
+Future<String> uploadImage() async {
+  var url = Uri.parse('https://api.lakme.mirrar.com/hairstylecolor/hairType/all/brand/ec3e6733-cdd4-474f-b01d-c073655fa105/subBrandId/a9562e09-7a61-472f-a1f7-e719c897e97c');
+  
+  try {
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // API call successful, you can handle the response here
+      print(response.body);
+      return response.body;
+    } else {
+      // API call failed, handle the error
+      print('API request failed with status code: ${response.statusCode}');
+      throw Exception('API call failed with status: ${response.statusCode}');
+    }
+  } catch (error) {
+    // Exception occurred during API call
+    print('API request failed with error: $error');
+    throw Exception('API call failed with status: $error');
+  }
+}
+
+Future<String> getImageTryOnResponse(String imagePath, String imageId) async {
+  var url = Uri.parse('https://api.hair.mirrar.io/tryon/');
+  
+  var request = http.MultipartRequest('POST', url);
+  request.fields['hairstyle_image_path'] = imagePath;
+  request.fields['user_image_id'] = imageId;
+  
+  var response = await request.send();
+  
+  if (response.statusCode == 200) {
+    String responseString = await response.stream.transform(utf8.decoder).join();
+    print("checkMessage $responseString");
+    return responseString;
   } else {
-    Navigator.pop(context);
-    return Future.value(false);
-  }
-}
-Future<bool> _exitAppSafari(BuildContext context) async {
-  
-    Navigator.pop(context);
-    return Future.value(false);
-  
-}
-   @override
-  Widget build(BuildContext context) {
-    if (load){
-      return Scaffold(
-        backgroundColor: Colors.black,
-        bottomNavigationBar: Container(
-          height: 50,
-          color: Colors.white,
-          child: InkWell(
-            onTap: () => _exitApp(context),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.arrow_back_ios,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  Text('Dismiss'),
-                ],
-              ),
-            ),
-          ),),
-        body: InAppWebView(
-          key: webViewKey,
-          initialUrlRequest: URLRequest(url: Uri.parse(baseUrl!)),
-          initialOptions: InAppWebViewGroupOptions(
-            crossPlatform: InAppWebViewOptions(
-                mediaPlaybackRequiresUserGesture: false,
-                useOnDownloadStart: true,
-                useShouldOverrideUrlLoading: true),
-           
-          ),
-          shouldOverrideUrlLoading: (controller, navigationAction) async {
-            var uri = navigationAction.request.url;
-            String url = uri.toString();
-            if(url.contains('whatsapp')){
-            int t = url.indexOf('text');
-            int end = url.indexOf('source');
-            String sendUrl = url.substring(t + 5, end - 1);
-            Share.text('MirrAR', '$sendUrl', 'text/plain');
-            onMessageCallback("whatsapp", sendUrl);
-             return NavigationActionPolicy.CANCEL;
-            }
-            else
-             return NavigationActionPolicy.ALLOW;
-           
-          },
-          onWebViewCreated: (InAppWebViewController controller) {
-            _webViewController = controller;
+    print('Request failed with status: ${response.statusCode}');
+        throw Exception('API call failed with status: ${response.statusCode}');
 
-            _webViewController!.addJavaScriptHandler(
-                handlerName: 'message',
-                callback: (args) {
-                  String str = args.toString();
-                  print("message: asasasaas $str");
-                  String event = '';
-                  int j = 0;
-                  for (int i = 9; i < str.length; i++) {
-                    if (str[i] != ',') {
-                      event += str[i];
-                    } else {
-                      j = i;
-                      break;
-                    }
-                  }
-                  int k = 0;
-                  String secondArg = '';
-                  int check = 0;
-                  for (int i = j + 2; i < str.length; i++) {
-                    if (str[i] != ",") {
-                      secondArg += str[i];
-                    } else {
-                      k = i;
-                      break;
-                    }
-                  }
-
-                  
-                 
-                // print("eventName: $event");
-                  if (event == "mirrar-popup-closed") {
-                    onMessageCallback("mirrar-popup-closed", secondArg);
-                  }
-                  else if (event == "details") {
-                    onMessageCallback("details", secondArg);
-                  } else if (event == "wishlist") {
-                    onMessageCallback("wishlist", secondArg);
-                  } else if (event == "unwishlist") {
-                    onMessageCallback("unwishlist", secondArg);
-                  } else if (event == "cart") {
-                    onMessageCallback("cart", secondArg);
-                  } else if (event == "remove_cart") {
-                    onMessageCallback("remove_cart", secondArg);
-                  } else if (event == "share") {
-                    print("checkitonce");
-                    List<String> listStr =  List<String>.filled(0,'', growable:true);
-                  listStr = str.split(',');
-                  // for(int i=0;i<listStr.length;i++){
-                  //   print("checkitonce: ${listStr.elementAt(i)}");
-                  // }
-                  String substring = listStr.elementAt(2);
-                    Uint8List _bytes = base64.decode(substring);
-                    Share.file('MirrAR SDK', 'mirrar.jpg', _bytes, 'image/jpg');
-                    onMessageCallback("share", substring);
-                  }
-                });
-          },
-          onConsoleMessage: (controller, consoleMessage) {
-            print("checktest $consoleMessage");
-          },
-          androidOnPermissionRequest: (InAppWebViewController controller,
-              String origin, List<String> resources) async {
-            return PermissionRequestResponse(
-                resources: resources,
-                action: PermissionRequestResponseAction.GRANT);
-          },
-          onDownloadStart: (controller, url) async {
-            print("onDownloadStart $url");
-            onMessageCallback("download", url.toString());
-
-            _createFileFromString(url.toString());
-          },
-        ),
-      );
-    }
-    else {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        bottomNavigationBar: Container(
-          height: 50,
-          color: Colors.white,
-          child: InkWell(
-            onTap: () => _exitAppSafari(context),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(10, 4, 0, 0),
-              child: Row(
-                children: <Widget>[
-                  Icon(
-                    Icons.arrow_back_ios,
-                    color: Theme.of(context).accentColor,
-                  ),
-                  Text('Dismiss'),
-                ],
-              ),
-            ),
-          ),),
-       
-          body: Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
-            ),
-          ));
-    }
   }
 }
 
-Future<String> _createFileFromString(String url) async {
-  int i = 0;
-  for (i = 0; i < url.length; i++) {
-    if (url[i] == ',') break;
-  }
-  String smallUrl = url.substring(i + 1, url.length);
 
-  Uint8List bytes = base64.decode(smallUrl);
-  String dir = (await getApplicationDocumentsDirectory()).path;
-  String fullPath = '$dir/abc.png';
-  print("local file full path $smallUrl");
-  File file = File(fullPath);
-  await file.writeAsBytes(bytes);
-  print(file.path);
-
-  final result = await ImageGallerySaver.saveImage(bytes);
-  print(result);
-
-  return file.path;
-}

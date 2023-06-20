@@ -20,6 +20,8 @@ dependencies:
   
   permission_handler: ^5.1.0+2
   provider: ^5.0.0
+  dio: ^4.0.0
+  async: ^2.4.2
 
   plugin_mirrar:
     # When depending on this package from a real application you should use:
@@ -54,6 +56,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

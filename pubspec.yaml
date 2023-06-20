@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+    
+
   rounded_loading_button: ^2.0.5
   flutter_inappwebview: ^5.3.2
   permission_handler: ^5.1.0+2
@@ -27,7 +29,12 @@ dependencies:
   json_annotation: ^4.0.1
   flutter_downloader: ^1.5.2
   path_provider: ^1.6.28
+  flutter_svg: ^0.21.0
+  image_picker: ^0.6.6+1
+  flutter_image_compress: ^0.7.0
+  image: ^3.0.1
 
+   
 
 dev_dependencies:
   flutter_test:
@@ -43,6 +50,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+
+
   # This section identifies this Flutter project as a plugin project.
   # The 'pluginClass' and Android 'package' identifiers should not ordinarily
   # be modified. They are used by the tooling to maintain consistency when
@@ -55,11 +64,9 @@ flutter:
       ios:
         pluginClass: PluginMirrarPlugin
 
-  # To add assets to your plugin package, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-  #
+    assets:     
+      - assets/images/
+
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages
   #

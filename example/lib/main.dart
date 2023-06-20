@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:plugin_mirrar_example/launch_mirrar.dart';
+import 'package:plugin_mirrar_example/select_mode.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -49,8 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title: const Text('Mirrar SDK'), backgroundColor: Colors.pink),
+        appBar: null,
         body: Scaffold(
             body: SafeArea(
                 child: Center(
@@ -63,11 +62,16 @@ class _MyHomePageState extends State<MyHomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MirrarPage()));
+                                    builder: (context) => SelectMode()));
                           },
                           color: Colors.pink,
                           textColor: Colors.white,
                           splashColor: Colors.grey,
-                        ))))));
+                         )
+                        )
+                       )
+                      )
+                    )
+                  );
   }
 }
