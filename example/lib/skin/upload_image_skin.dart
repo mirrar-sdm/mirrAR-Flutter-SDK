@@ -55,7 +55,7 @@ Future<void> _selectImage(BuildContext context) async {
 }
   Future<void> _getImage(ImageSource source) async {
     final picker = ImagePicker();
-    final pickedImage = await ImagePicker.pickImage(source: source);
+    final pickedImage = await picker.pickImage(source: source);
 
     if (pickedImage != null) {
       setState(() {
@@ -155,7 +155,7 @@ Future<void> _resizeAndEncodeImage() async {
               Center(
                 child: Container(
                   margin: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                  child: ElevatedButton(
+                  child: TextButton(
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith(
                         (states) => Colors.white,

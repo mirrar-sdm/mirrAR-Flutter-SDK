@@ -18,7 +18,7 @@ dependencies:
   flutter:
     sdk: flutter
   
-  permission_handler: ^5.1.0+2
+  permission_handler: ^10.3.0
   provider: ^5.0.0
   dio: ^4.0.0
   async: ^2.4.2

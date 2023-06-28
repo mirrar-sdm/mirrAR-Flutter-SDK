@@ -56,17 +56,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Container(
                         width: 200,
                         height: 50,
-                        child: RaisedButton(
+                        child: ElevatedButton(
                           child: Text("Launch Mirrar"),
+                          style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => Colors.pink,
+                      ),
+                    ),
                           onPressed: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => SelectMode()));
                           },
-                          color: Colors.pink,
-                          textColor: Colors.white,
-                          splashColor: Colors.grey,
+                         
                          )
                         )
                        )

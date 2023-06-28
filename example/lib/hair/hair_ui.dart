@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -78,7 +80,7 @@ Future<void> _selectImage(BuildContext context) async {
 }
  Future<void> _getImage(ImageSource source) async {
     final picker = ImagePicker();
-    final pickedImage = await ImagePicker.pickImage(source: source);
+    final pickedImage = await picker.pickImage(source: source);
 
     if (pickedImage != null) {
       setState(() {

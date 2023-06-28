@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

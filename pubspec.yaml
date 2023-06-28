@@ -15,9 +15,9 @@ dependencies:
 
   rounded_loading_button: ^2.0.5
   flutter_inappwebview: ^5.3.2
-  permission_handler: ^5.1.0+2
-  esys_flutter_share: ^1.0.2
-  url_launcher: ^5.4.5
+  permission_handler: ^10.3.0
+  esys_flutter_share_plus: ^2.2.0
+  url_launcher: ^6.1.11
   device_info: ^2.0.2
   http: ^0.13.3
   flutter_webview_plugin: ^0.4.0
@@ -28,10 +28,10 @@ dependencies:
   built_value: ^8.0.6
   json_annotation: ^4.0.1
   flutter_downloader: ^1.5.2
-  path_provider: ^1.6.28
+  path_provider: ^2.0.15
   flutter_svg: ^0.21.0
-  image_picker: ^0.6.6+1
-  flutter_image_compress: ^0.7.0
+  image_picker: ^1.0.0
+  flutter_image_compress: ^2.0.3
   image: ^3.0.1
 
    

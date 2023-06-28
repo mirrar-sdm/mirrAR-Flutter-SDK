@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
+import 'package:esys_flutter_share_plus/esys_flutter_share_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -91,7 +91,7 @@ Future<bool> _exitAppSafari(BuildContext context) async {
                 children: <Widget>[
                   Icon(
                     Icons.arrow_back_ios,
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).primaryColor,
                   ),
                   Text('Dismiss'),
                 ],
@@ -215,7 +215,7 @@ Future<bool> _exitAppSafari(BuildContext context) async {
                 children: <Widget>[
                   Icon(
                     Icons.arrow_back_ios,
-                    color: Theme.of(context).accentColor,
+                    color: Theme.of(context).primaryColor,
                   ),
                   Text('Dismiss'),
                 ],

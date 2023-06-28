@@ -50,7 +50,7 @@ class SelectMode extends StatelessWidget {
                 children: [
                   Container(
                     margin: EdgeInsets.all(10),
-                    height: 110,
+                    height: 120,
                     width: 100,
   decoration: BoxDecoration(
     color: Colors.white,
@@ -61,8 +61,8 @@ class SelectMode extends StatelessWidget {
     ),
   ),
   child: Padding(
-    padding: EdgeInsets.all(10),
-  child:FlatButton(
+    padding: EdgeInsets.only(top: 4),
+  child:TextButton(
     onPressed: () {
       // Handle Card 1 onPressed
       Navigator.push(
@@ -73,7 +73,9 @@ class SelectMode extends StatelessWidget {
     },
     child: Column(
       children: [
-        Image.asset('assets/images/hair.png'),
+        Image.asset('assets/images/hair.png',
+        height: 60,
+        width: 60,),
          Padding(
     padding: EdgeInsets.fromLTRB(0,20,0,0),
   child:Text('Hair'),
@@ -86,7 +88,7 @@ class SelectMode extends StatelessWidget {
 
 Container(
                     margin: EdgeInsets.all(10),
-                    height: 110,
+                    height: 120,
                     width: 100,
   decoration: BoxDecoration(
         color: Colors.white,
@@ -98,8 +100,8 @@ Container(
     ),
   ),
   child: Padding(
-    padding: EdgeInsets.all(10),
-  child: FlatButton(
+    padding: EdgeInsets.only(top: 4),
+  child: TextButton(
     onPressed: () {
       // Handle Card 1 onPressed
       Navigator.push(
@@ -109,9 +111,11 @@ Container(
     },
     child: Column(
       children: [
-       Image.asset('assets/images/face.png'),
+       Image.asset('assets/images/face.png',
+        height: 60,
+        width: 60,),
        Padding(
-    padding: EdgeInsets.fromLTRB(0,14,0,0),
+    padding: EdgeInsets.fromLTRB(0,20,0,0),
   child:Text('Skin'),
          )
       ],
@@ -121,7 +125,7 @@ Container(
 
 Container(
                     margin: EdgeInsets.all(10),
-                    height: 110,
+                    height: 120,
                     width: 100,
   decoration: BoxDecoration(
         color: Colors.white,
@@ -133,8 +137,8 @@ Container(
     ),
   ),
   child: Padding(
-    padding: EdgeInsets.all(5),
-  child:FlatButton(
+    padding: EdgeInsets.only(top:4),
+  child:TextButton(
     onPressed: () {
       // Handle Card 1 onPressed
 
@@ -174,9 +178,11 @@ Container(
     },
     child: Column(
       children: [
-        Image.asset('assets/images/makeover.png'),
+        Image.asset('assets/images/makeover.png',
+        height: 60,
+        width: 60,),
         Padding(
-    padding: EdgeInsets.fromLTRB(0,16,0,0),
+    padding: EdgeInsets.fromLTRB(0,20,0,0),
   child:Text('Makeup'),
          )
       ],
