@@ -68,6 +68,26 @@ class _MyHomePageState extends State<MirrarSDK> {
     Map valueMap = json.decode(jsonData!);
     // print(valueMap);
     //print(valueMap['options']['productData']);
+    var oldDomain = "https://cdn.mirrar.com/general/mirrar.html";
+    var newVersionDomain = "https://cdn.mirrar.com/mirrar-jewellery-webar-new/index.html";
+    var baseDomain = oldDomain;
+    var dio = Dio();
+    try {
+      var response = await dio.request(
+        'https://ar-api.mirrar.com/brand/newmirrarapplicable/brand/${uuid!}',
+        options: Options(
+          method: 'GET',
+        ),
+      );
+      if (response.statusCode == 200) {
+        var mirrarV2Applicable = response.data['data']['mirrarV2Applicable'];
+        if (mirrarV2Applicable) {
+          baseDomain = newVersionDomain;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
 
     var showProductMap =
         valueMap['options']['productData'] as Map<String, dynamic>;
@@ -109,7 +129,7 @@ class _MyHomePageState extends State<MirrarSDK> {
 
     setState(() {
       baseUrl =
-          "https://cdn.mirrar.com/general/mirrar.html?brand_id=${uuid!}$csv&sku=${codes[1] ?? ""}&platform=android-sdk-flutter";
+          "${baseDomain}?brand_id=${uuid!}$csv&sku=${codes[1] ?? ""}&platform=android-sdk-flutter";
       print(baseUrl);
       load = true;
     });
@@ -139,6 +159,10 @@ class _MyHomePageState extends State<MirrarSDK> {
   }
 
   Future<bool> _exitApp(BuildContext context) async {
+     setState(() {
+        baseUrl = "";
+        load = false;
+      });
     if (await _webViewController!.canGoBack()) {
       print("onwill goback");
       _webViewController!.goBack();
